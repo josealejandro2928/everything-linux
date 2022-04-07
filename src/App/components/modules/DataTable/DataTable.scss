@@ -1,0 +1,24 @@
+.DataTable {
+    padding: 32px 16px;
+    max-width: 96%;
+    box-sizing: border-box;
+    width: 100%;
+    margin: 0px auto;
+
+    .th {
+        position: relative;
+        cursor: pointer;
+
+        &:hover {
+            i {
+                opacity: 1.0;
+            }
+        }
+
+        i {
+            position: absolute;
+            right: 4px;
+            opacity: 0.0;
+        }
+    }
+}

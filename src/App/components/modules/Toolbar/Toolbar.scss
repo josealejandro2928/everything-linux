@@ -1,0 +1,28 @@
+.Toolbar {
+    display: block;
+    box-sizing: border-box;
+    padding: 4px 8px;
+    height: auto;
+    background-color: #282828;
+    color: #fff;
+    box-shadow: 1px 2px 4px rgba(0, 0, 0, .5);
+}
+
+.divider {
+    height: 100%;
+    width: 2px;
+}
+
+.Toolbar.dark {
+    background-color: #282828;
+    color: #fff;
+
+    .divider {
+        background-color: #fff;
+    }
+}
+
+.Toolbar.light {
+    background-color: #228be6;
+    color: #fff;
+}

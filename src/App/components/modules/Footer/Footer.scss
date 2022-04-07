@@ -1,0 +1,23 @@
+.Footer {
+    z-index: 10;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 60px;
+    padding: 8px 16px;
+
+}
+
+.Footer.dark {
+    background-color: #111111;
+    color: #fff;
+
+    .divider {
+        background-color: #fff;
+    }
+}
+
+.Footer.light {
+    background-color: #228be6;
+    color: #fff;
+}
