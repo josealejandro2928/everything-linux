@@ -5,9 +5,9 @@ const { ipcRenderer } = window.require('electron');
 
 function App() {
   useEffect(() => {
-    ipcRenderer.send('run-init', { "name": "Jose" })
+    ipcRenderer.send('search', { directories: null, searchParam: '', options: { hiddenFiles: false } })
 
-    ipcRenderer.on('run-init:response', (event: any, arg: any) => {
+    ipcRenderer.on('found', (event: any, arg: any) => {
       console.log("🚀 ~ file: App.tsx ~ line 11 ~ ipcRenderer.on ~ data", arg)
     })
 
