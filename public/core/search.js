@@ -9,14 +9,18 @@ class Search {
         this.stopped = false;
     }
 
-    search(directories, searchParam = '', options = { hiddenFiles: false, levels: null }, event) {
+    search(directories, searchParam = '', options = { hiddenFiles: false, levels: null, reportFound: true }, event) {
         if (this.stopped) return;
         let onlyRoot = false;
 
         if (!directories || !directories?.length) {
-            directories = ['/'];
+            directories = ['/', '/media'];
             onlyRoot = true;
         }
+
+        if (!searchParam)
+            onlyRoot = true;
+
         directories = directories instanceof Array ? directories : [directories];
         directories = directories.map((el) => ({ link: el, level: 0 }));
         let level = 0;
@@ -49,7 +53,8 @@ class Search {
                     if (found) {
                         // console.log("🚀 ~ file: search.js ~ line 59 ~ filterElement ~ found", found);
                         result.push(found);
-                        event.reply('found', { data: found })
+                        if (options.reportFound)
+                            event.reply('found-result', { data: found })
                     }
 
                     if (!onlyRoot && level <= options.levels) {
