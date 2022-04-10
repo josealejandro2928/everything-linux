@@ -6,6 +6,7 @@ import {
   SET_NEW_RESULT,
   SET_RESULTS,
   SET_TEXT_SIZE,
+  SET_ORDER,
 } from '../reducers/search.reducer';
 
 export const setSearchFile = (searchStr: string) => async (dispatch: Function) => {
@@ -47,6 +48,15 @@ export const setTextSize =
   (data: 'xs' | 'sm' | 'md' | 'lg' | 'xl') => async (dispatch: Function) => {
     return dispatch({
       type: SET_TEXT_SIZE,
+      payload: data,
+    });
+  };
+
+export const setOrder =
+  (data: '-name' | '+name' | '-size' | '+size' | '+type' | '-type') =>
+  async (dispatch: Function) => {
+    return dispatch({
+      type: SET_ORDER,
       payload: data,
     });
   };

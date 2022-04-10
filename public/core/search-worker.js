@@ -67,7 +67,7 @@ function search(
                         parentPort.postMessage(found);
                     }
                 }
-                
+
                 if (!onlyRoot && (options.levels == null || level <= options.levels)) {
                     try {
                         if (isDirectory) {
@@ -91,15 +91,7 @@ function getMedataFile(res, fullPath, isDirectory) {
     try {
         if (!isDirectory) {
             let data = fs.statSync(fullPath);
-            var fileSizeInMegabytes = data.size / (1024 * 1024);
-            if (fileSizeInMegabytes > 1) {
-                meta.size = fileSizeInMegabytes.toPrecision(2) + ' mB';
-            }
-            if (fileSizeInMegabytes > 1e-3) {
-                meta.size = (1024 * fileSizeInMegabytes).toFixed(2) + ' kB';
-            } else {
-                meta.size = (1024 * 1024 * fileSizeInMegabytes).toFixed(2) + ' bytes';
-            }
+            meta.size = data.size;
             meta.mimetype = path.extname(fullPath).split('.')[1];
         }
         return meta;
@@ -109,10 +101,12 @@ function getMedataFile(res, fullPath, isDirectory) {
 }
 
 function filterElement(searchParam, element, parentDir, isDirectory) {
-    const elementName = element.name.toLowerCase();
-    const searchItem = searchParam.toLowerCase().trim();
+
+    const elementName = element.name.toLowerCase().trim();
+    let searchItem = searchParam.toLowerCase().trim();
     let indexSearch = null;
-    if (searchParam instanceof RegExp) {
+
+    if (searchItem[0] == '/' && searchItem[searchItem.length - 1] == '/') {
         indexSearch = elementName.search(searchItem);
     } else {
         indexSearch = elementName.includes(searchItem);

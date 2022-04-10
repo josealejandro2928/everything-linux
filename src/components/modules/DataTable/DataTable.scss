@@ -9,17 +9,18 @@
         position: relative;
         cursor: pointer;
 
-        &:hover {
-            i {
-                opacity: 1.0;
-            }
-        }
-
         i {
             position: absolute;
             right: 4px;
-            opacity: 0.0;
         }
+
+        &:hover {
+            i {
+                opacity: 1 !important;
+            }
+        }
+
+
     }
 
     td {
