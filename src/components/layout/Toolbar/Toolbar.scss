@@ -6,6 +6,9 @@
     background-color: #282828;
     color: #fff;
     box-shadow: 1px 2px 4px rgba(0, 0, 0, .5);
+    position: fixed;
+    width: 100%;
+    z-index: 10;
 }
 
 .divider {

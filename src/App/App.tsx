@@ -1,12 +1,17 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import './App.scss';
-import Layout from '../components/layout/Layout';
+import Layout from '../components/layout/layout/Layout';
 import { ColorScheme, ColorSchemeProvider, MantineProvider } from '@mantine/core';
 import { useLocalStorage } from '@mantine/hooks';
 import DataTable from '../components/modules/DataTable/DataTable';
-import Footer from '../components/modules/Footer/Footer';
-import { useSelector } from 'react-redux';
+import Footer from '../components/layout/Footer/Footer';
+import { useDispatch, useSelector } from 'react-redux';
 import { State } from '../store/reducers';
+import { IFile, IRequestSearch } from '../models/file.model';
+import { setIsSearching, setNewResult, setResults } from '../store/actions/search.actions';
+import LoadingSearch from '../components/modules/LoadingSearch/LoadingSearch';
+const { ipcRenderer } = window.require('electron');
+
 
 function App() {
   const [colorScheme, setColorScheme] = useLocalStorage<ColorScheme>({
@@ -20,11 +25,59 @@ function App() {
 
   const directory = useSelector((state: State) => state.search.directory);
   const searchFile = useSelector((state: State) => state.search.searchFile);
+  const options = useSelector((state: State) => state.search.options);
+  const isSearching = useSelector((state: State) => state.search.isSearching);
+  const mount = useRef<number>(0);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    console.log("directory", directory);
-    console.log("searchFile", searchFile);
-  }, [directory, searchFile])
+    if (mount.current < 2) {
+      mount.current++;
+      return;
+    }
+    console.log("Ejecute esto")
+    onSearch();
+  }, [directory, searchFile, options])
+
+  useEffect(() => {
+    ipcRenderer.on('found-result', (_: any, data: { data: IFile }) => {
+      dispatch(setNewResult(data.data));
+    });
+  }, [])
+
+  useEffect(() => {
+    ipcRenderer.on('finish', () => {
+      dispatch(setIsSearching(false));
+    });
+  }, [])
+
+  useEffect(() => {
+    console.log(isSearching);
+  }, [isSearching])
+
+  async function onSearch() {
+    ipcRenderer.send('stop-current-search');
+    dispatch(setIsSearching(true));
+    dispatch(setResults([]));
+    await _delayMs(300);
+    const requestToSearch: IRequestSearch = {
+      directories: directory,
+      searchParam: searchFile as string,
+      options: options
+    }
+    ipcRenderer.send('search', requestToSearch);
+  }
+
+  function onStopCurrentSearch() {
+    ipcRenderer.send('stop-current-search');
+    dispatch(setIsSearching(false));
+  }
+
+  function _delayMs(ms: number): any {
+    return new Promise((resolve, _) => {
+      setTimeout(() => (resolve(true)), ms || 200);
+    })
+  }
 
 
 
@@ -38,6 +91,7 @@ function App() {
             <Footer></Footer>
           </Layout>
         </div>
+        <LoadingSearch opened={isSearching} setOpened={onStopCurrentSearch} />
       </MantineProvider>
     </ColorSchemeProvider>
   );

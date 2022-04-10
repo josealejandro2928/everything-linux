@@ -1,4 +1,4 @@
-import { Grid, Group, Select, Text } from '@mantine/core';
+import { Grid, Group, Select, Text, Tooltip } from '@mantine/core';
 import { useLocalStorage } from '@mantine/hooks';
 import React, { forwardRef, useEffect } from 'react';
 import { IFile } from '../../../models/file.model';

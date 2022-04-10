@@ -1,29 +1,63 @@
 console.log("Cargo el core");
 
+const path = require('path');
 const { ipcMain } = require('electron')
-const searchObject = require('./search');
+const Search = require('./search');
+const searchObject = new Search();
+const { Worker } = require('worker_threads');
 
+let worker;
 
-ipcMain.on('run-init', (event, arg) => {
-    //execute tasks on behalf of renderer process 
-    console.log("event", arg) // prints "ping"
-    console.log("arg", arg) // prints "ping"
-    event.reply('run-init:response', ['data', 'data-2', 'data-3'])
-})
-
-ipcMain.on('search', (event, arg) => {
-    console.log("********search********", arg) // prints "ping"
+ipcMain.on('search', async (event, arg) => {
+    // console.log("********ENTRE EN EL SEARCH********", arg) // prints "ping"
     let { directories, searchParam, options } = arg;
     options = { ...options, reportFound: true };
-    // directories, searchParam = '', options = { hiddenFiles: false, levels: null }, event
-    searchObject.search(directories || null, searchParam || '', options, event);
-    searchObject.setStopped(false);
-    event.reply('finish', {})
+
+    try {
+        if (worker) {
+            worker.removeAllListeners();
+            await worker?.terminate();
+        }
+
+        worker = new Worker(path.join(__dirname, 'search-worker.js'), {
+            workerData: {
+                directories,
+                searchParam,
+                options,
+            }
+        });
+
+
+        worker.on('message', (found) => {
+            event.reply('found-result', { data: found })
+        })
+
+        worker.on("error", (error) => {
+            console.log("🚀 ~ file: index.js ~ line 38 ~ worker.on ~ error", error)
+            event.reply('finish', {})
+        })
+
+        worker.on("exit", (code) => {
+            console.log("EXIT CODE OF WORKER:", code);
+            if (code) {
+                console.log("*****WORKER FINISH***********");
+                event.reply('finish', {})
+
+            } else {
+                console.log("*****WORKER FINISH WITH ERRORS***********");
+                event.reply('finish', {})
+            }
+        })
+
+
+
+    } catch (e) {
+        console.log("🚀 ~ file: index.js ~ line 35 ~ ipcMain.on ~ e", e)
+    }
 })
 
-ipcMain.on('root-dir', (event, arg) => {
-    console.log("********root-dir********", arg)
-    let result = searchObject.search(null, '', { reportFound: false }, event);
+ipcMain.on('root-dir', (event, _) => {
+    let result = searchObject.search(null, '', { reportFound: false }, event) || [];
     searchObject.setStopped(false);
     result = result.filter((el) => el.isDirectory);
     result.unshift({ name: 'Computer', path: '/', isDirectory: true })
@@ -31,8 +65,11 @@ ipcMain.on('root-dir', (event, arg) => {
 })
 
 // eslint-disable-next-line no-unused-vars
-ipcMain.on('stop-current-search', (event, arg) => {
-    //execute tasks on behalf of renderer process 
-    searchObject.setStopped(false);
-    event.reply('finish', {})
+ipcMain.on('stop-current-search', async (event, _) => {
+    console.log("Entre en el Stop");
+    if (worker) {
+        worker.removeAllListeners();
+        await worker?.terminate();
+    }
+    searchObject.setStopped(true);
 })

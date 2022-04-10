@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Eraser, Search } from 'tabler-icons-react';
 import { State } from '../../../store/reducers';
-import { setSearchFile } from '../../../store/actions/search.actions';
+import { setSearchFile, setResults } from '../../../store/actions/search.actions';
 
 
 const SearchInput = () => {
@@ -13,11 +13,13 @@ const SearchInput = () => {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        dispatch(setSearchFile(debounced));
+        let isBigEnough = value?.trim()?.length > 2;
+        if (isBigEnough || !value)
+            dispatch(setSearchFile(debounced));
     }, [debounced])
 
     const clearSection = (
-        <Tooltip onClick={() => { setValue('') }} label="Clear" position="top" placement="end">
+        <Tooltip onClick={() => { setValue(''); dispatch(setResults([])) }} label="Clear" position="top" placement="end">
             <Eraser size={20} style={{ display: 'block', opacity: 0.6, cursor: 'pointer' }} />
         </Tooltip>
     );

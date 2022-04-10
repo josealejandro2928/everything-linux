@@ -1,16 +1,14 @@
-import { Container, Grid, Select, Table } from '@mantine/core';
 import React from 'react';
+import { ScrollArea, Table, Text } from '@mantine/core';
+import { useSelector } from 'react-redux';
 import { ArrowNarrowUp } from 'tabler-icons-react';
+import { State } from '../../../store/reducers';
 import './DataTable.scss'
 
 const DataTable = () => {
-    const elements = [
-        { position: 6, mass: 12.011, symbol: 'C', name: 'Carbon' },
-        { position: 7, mass: 14.007, symbol: 'N', name: 'Nitrogen' },
-        { position: 39, mass: 88.906, symbol: 'Y', name: 'Yttrium' },
-        { position: 56, mass: 137.33, symbol: 'Ba', name: 'Barium' },
-        { position: 58, mass: 140.12, symbol: 'Ce', name: 'Cerium' },
-    ];
+    const elements = useSelector((state: State) => state.search.result);
+    const textSize = useSelector((state: State) => state.search.textSize)
+    // console.log("🚀 ~ file: DataTable.tsx ~ line 10 ~ DataTable ~ elements", elements)
 
     const ths = (
         <tr>
@@ -41,23 +39,44 @@ const DataTable = () => {
         </tr>
     );
 
-    const rows = elements.map((element) => (
-        <tr key={element.name}>
-            <td>{element.position}</td>
-            <td>{element.name}</td>
-            <td>{element.symbol}</td>
-            <td>{element.mass}</td>
+    const rows = elements.map((element, index) => (
+        <tr key={element.path + element.name + index}>
+            <td>
+                <Text size={textSize} lineClamp={2}>
+                    {element.name}
+                </Text>
+            </td>
+            <td>
+                <Text size={textSize} lineClamp={1}>
+                    {element.size}
+                </Text>
+            </td>
+            <td>
+                <Text size={textSize} lineClamp={1}>
+                    {element.mimetype}
+                </Text>
+            </td>
+            <td>
+                <Text size={textSize} lineClamp={1}>
+                    {element.path}
+                </Text>
+            </td>
         </tr>
     ));
 
     return (
         <div className='DataTable'>
-            <Table striped highlightOnHover verticalSpacing={'sm'} captionSide="bottom">
-                <thead>{ths}</thead>
-                <tbody>{rows}</tbody>
-                <caption>Some elements from periodic table</caption>
-            </Table>
-        </div>
+            <ScrollArea style={{ height: 'calc(100vh - (68px + 70px))', width: '100%' }}>
+                <Table highlightOnHover verticalSpacing="xs" captionSide="bottom">
+                    <thead>{ths}</thead>
+
+                    <tbody>
+                        {rows}
+                    </tbody>
+
+                </Table>
+            </ScrollArea>
+        </div >
     )
 }
 

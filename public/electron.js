@@ -12,11 +12,11 @@ function createWindow() {
         height: 720,
         minWidth: 600,
         minHeight: 400,
-        autoHideMenuBar: true,
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false,
             enableRemoteModule: true,
+            nodeIntegrationInWorker: true
         },
     });
 

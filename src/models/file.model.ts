@@ -5,3 +5,12 @@ export interface IFile {
   size: string;
   mimetype: string;
 }
+
+export interface IRequestSearch {
+  directories: string | Array<string> | null | undefined;
+  searchParam: string | null;
+  options?: {
+    hiddenFiles: boolean;
+    levels: number | null | undefined;
+  };
+}

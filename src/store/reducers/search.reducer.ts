@@ -5,6 +5,12 @@ export interface SearchState {
   directory: string;
   searchFile: string | null | undefined;
   result: Array<IFile>;
+  isSearching: boolean;
+  options: {
+    hiddenFiles: boolean;
+    levels: number | null | undefined;
+  };
+  textSize: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 }
 /////////////////////////////////////////////////////////////////
 
@@ -14,6 +20,8 @@ export const SET_DIRECTORY = 'SET_DIRECTORY';
 export const SET_SEARCH_FILE = 'SET_SEARCH_FILE';
 export const SET_NEW_RESULT = 'SET_NEW_RESULT';
 export const SET_RESULTS = 'SET_RESULTS';
+export const SET_IS_SERCHING = 'SET_IS_SERCHING';
+export const SET_TEXT_SIZE = 'SET_TEXT_SIZE';
 
 ///////////////////////////////////////////////////////////
 
@@ -21,6 +29,12 @@ const initialState: SearchState = {
   directory: '/',
   searchFile: null,
   result: [],
+  isSearching: false,
+  options: {
+    hiddenFiles: false,
+    levels: null,
+  },
+  textSize: 'sm',
 };
 
 const searchReducer = (
@@ -34,9 +48,16 @@ const searchReducer = (
     case SET_SEARCH_FILE:
       return { ...state, searchFile: payload };
     case SET_NEW_RESULT:
-      return { ...state, result: [...state.result, payload] };
+      let newArray = state.result.filter((e) => e.name != payload.name);
+      newArray.push(payload);
+      return { ...state, result: newArray };
     case SET_RESULTS:
       return { ...state, result: payload };
+    case SET_IS_SERCHING:
+      return { ...state, isSearching: payload };
+    case SET_TEXT_SIZE:
+      const data = payload as 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+      return { ...state, textSize: data };
     default:
       return state;
   }

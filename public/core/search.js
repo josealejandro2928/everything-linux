@@ -10,6 +10,7 @@ class Search {
     }
 
     search(directories, searchParam = '', options = { hiddenFiles: false, levels: null, reportFound: true }, event) {
+        console.log("********ENTRE EN EL SEARCH********", { directories, searchParam, options }) // prints "ping"
         if (this.stopped) return;
         let onlyRoot = false;
 
@@ -18,11 +19,18 @@ class Search {
             onlyRoot = true;
         }
 
-        if (!searchParam)
+        if (!searchParam) {
             onlyRoot = true;
+        }
 
         directories = directories instanceof Array ? directories : [directories];
         directories = directories.map((el) => ({ link: el, level: 0 }));
+
+        // console.log("🚀 ~ file: search.js ~ line 26 ~ Search ~ search ~ directories", directories)
+        // console.log("🚀 ~ file: search.js ~ line 13 ~ Search ~ search ~ searchParam", searchParam)
+        // console.log("🚀 ~ file: search.js ~ line 13 ~ Search ~ search ~ options", options)
+        // console.log("🚀 ~ file: search.js ~ line 23 ~ Search ~ search ~ onlyRoot", onlyRoot)
+
         let level = 0;
 
         try {
@@ -53,11 +61,13 @@ class Search {
                     if (found) {
                         // console.log("🚀 ~ file: search.js ~ line 59 ~ filterElement ~ found", found);
                         result.push(found);
-                        if (options.reportFound)
-                            event.reply('found-result', { data: found })
+                        if (options.reportFound) {
+                            event?.reply('found-result', { data: found });
+                            // console.log(found);
+                        }
                     }
 
-                    if (!onlyRoot && level <= options.levels) {
+                    if (!onlyRoot && (options.levels == null || level <= options.levels)) {
                         try {
                             if (isDirectory) {
                                 queue.push({ link: path.join(dir.link, element.name), level: dir.level + 1 })
@@ -119,4 +129,7 @@ class Search {
 }
 
 
-module.exports = new Search();
+module.exports = Search
+
+// const example = new Search();
+// console.log(example.search('/', 'gssi', { hiddenFiles: false, levels: 2, reportFound: true }));
