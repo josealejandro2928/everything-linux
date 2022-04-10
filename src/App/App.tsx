@@ -10,6 +10,7 @@ import { State } from '../store/reducers';
 import { IFile, IRequestSearch } from '../models/file.model';
 import { setIsSearching, setNewResult, setResults } from '../store/actions/search.actions';
 import LoadingSearch from '../components/modules/LoadingSearch/LoadingSearch';
+import usePersistData from '../hooks/usePersistData';
 const { ipcRenderer } = window.require('electron');
 
 
@@ -23,7 +24,7 @@ function App() {
   const toggleColorScheme = (value?: ColorScheme) =>
     setColorScheme(value || (colorScheme === 'dark' ? 'light' : 'dark'));
 
-  const directory = useSelector((state: State) => state.search.directory);
+  const directory = usePersistData(useSelector((state: State) => state.search.directory), { key: 'directory' });
   const searchFile = useSelector((state: State) => state.search.searchFile);
   const options = useSelector((state: State) => state.search.options);
   const isSearching = useSelector((state: State) => state.search.isSearching);

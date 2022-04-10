@@ -2,12 +2,11 @@
 
 const fs = require('fs');
 const path = require('path');
+const mime = require('mime-types')
 
 const { parentPort, workerData } = require('worker_threads');
 
 const { directories, searchParam = '', options } = workerData;
-
-let stopped = false;
 
 function search(
     directories,
@@ -17,8 +16,7 @@ function search(
         levels: null,
         reportFound: true
     },) {
-    console.log("********ENTRE EN EL SEARCH WORKER********", { directories, searchParam, options }) // prints "ping"
-    if (stopped) return;
+    console.log("********ENTRE EN EL SEARCH WORKER********", { directories, searchParam, options }) // prints "pin
     let onlyRoot = false;
 
     if (!directories || !directories?.length) {
@@ -39,7 +37,6 @@ function search(
         let result = [];
         let queue = [...directories];
         for (let dir of queue) {
-            if (stopped) return;
             let output;
             level = dir.level;
             try {
@@ -49,17 +46,19 @@ function search(
             }
             let re = /^(?!\.).*$/;
             for (let element of output) {
-                if (stopped) return;
+
                 if (!options.hiddenFiles && !re.test(element.name))
                     continue;
 
                 let isDirectory = false;
+                let fileStats;
                 try {
-                    isDirectory = fs.lstatSync(path.join(dir.link, element.name)).isDirectory();
+                    fileStats = fs.lstatSync(path.join(dir.link, element.name));
+                    isDirectory = fileStats.isDirectory();
                 } catch (e) {
                     continue
                 }
-                const found = filterElement(searchParam, element, dir.link, isDirectory);
+                const found = filterElement(searchParam, element, dir.link, isDirectory, fileStats);
                 if (found) {
                     // console.log("🚀 ~ file: search.js ~ line 59 ~ filterElement ~ found", found);
                     result.push(found);
@@ -86,21 +85,57 @@ function search(
 
 }
 
-function getMedataFile(res, fullPath, isDirectory) {
+function getMedataFile(res, fullPath, isDirectory, fileStats) {
     const meta = { name: res.name, path: fullPath, isDirectory };
     try {
         if (!isDirectory) {
-            let data = fs.statSync(fullPath);
-            meta.size = data.size;
-            meta.mimetype = path.extname(fullPath).split('.')[1];
+            meta.size = fileStats.size;
+            meta.mimetype = mime.lookup(fullPath);
+
+            let sizeKb = meta.size / 1000;
+            meta.sizeLabel = meta.size.toFixed(1) + ' bytes';
+
+            if (sizeKb >= 1 && sizeKb <= 1000) {
+                meta.sizeLabel = sizeKb.toFixed(1) + ' Kb';
+            }
+            if (sizeKb > 1000 && sizeKb < 1e+6) {
+                sizeKb = sizeKb / 1000;
+                meta.sizeLabel = sizeKb.toFixed(1) + ' Mb';
+            }
+            if (sizeKb > 1e+6) {
+                sizeKb = sizeKb / 1000 / 1000;
+                meta.sizeLabel = sizeKb.toFixed(1) + ' Gb';
+            }
+        } else {
+            let result = fs.readdirSync(fullPath)
+            meta.size = result.length;
+            meta.sizeLabel = `${result.length} items`;
+            meta.mimetype = 'folder'
         }
+
+        meta.id = fileStats.birthtimeMs;
+        meta.lastDateModified = getDateModified(fileStats.mtime);
         return meta;
     } catch (e) {
         return null;
     }
+    //////////////HELPERS///////////////////////
+    function getDateModified(date) {
+        // date = new Date(date);
+        let dd = parseTwoDigits(date.getDay());
+        let mm = parseTwoDigits(date.getMonth());
+        let yyyy = parseTwoDigits(date.getFullYear());
+        let hh = parseTwoDigits(date.getHours());
+        let ss = parseTwoDigits(date.getSeconds());
+        function parseTwoDigits(x) {
+            return x < 10 ? `0${x}` : x;
+        }
+        return `${dd}/${mm}/${yyyy} ${hh}:${ss}`;
+    }
+    ////////////////////////////////////////////
 }
 
-function filterElement(searchParam, element, parentDir, isDirectory) {
+function filterElement(searchParam, element, parentDir, isDirectory, fileStats) {
 
     const elementName = element.name.toLowerCase().trim();
     let searchItem = searchParam.toLowerCase().trim();
@@ -112,7 +147,7 @@ function filterElement(searchParam, element, parentDir, isDirectory) {
         indexSearch = elementName.includes(searchItem);
     }
     if (indexSearch > -1 && indexSearch) {
-        let found = getMedataFile(element, path.join(parentDir, element.name), isDirectory)
+        let found = getMedataFile(element, path.join(parentDir, element.name), isDirectory, fileStats)
         return found
     }
     return null

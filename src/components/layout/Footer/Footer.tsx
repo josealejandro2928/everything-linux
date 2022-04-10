@@ -4,11 +4,13 @@ import './Footer.scss'
 import { useSelector, useDispatch } from 'react-redux';
 import { State } from '../../../store/reducers';
 import { setTextSize } from '../../../store/actions/search.actions';
+import usePersistData from '../../../hooks/usePersistData';
 
 function Footer() {
     const { colorScheme } = useMantineColorScheme();
-    const dispatch = useDispatch()
-    const textSize = useSelector((state: State) => state.search.textSize);
+    const dispatch = useDispatch();
+    const textSize = usePersistData(useSelector((state: State) => state.search.textSize), { key: 'textSize' });
+    const count = useSelector((state: State) => state.search.result.length)
 
     const value = useMemo(() => {
         if (textSize == 'xs') return 0;
@@ -30,22 +32,33 @@ function Footer() {
 
     return (
         <div className={colorScheme == 'dark' ? 'Footer dark' : 'Footer light'}>
-            <div style={{ width: '100px' }}>
-                <Text size='xs' style={{ marginBottom: '4px' }}>
-                    Font size:
+            <div style={{
+                'width': '100%', display: 'flex',
+                justifyContent: 'flex-end'
+            }}>
+                <div style={{ width: '100px' }}>
+                    <Text size='xs' style={{ marginBottom: '4px' }}>
+                        Font size:
+                    </Text>
+                    <Slider value={value}
+                        onChange={(val) => onSetTextSize(val)}
+                        size="sm"
+                        step={25}
+                        marks={[
+                            { value: 0, },
+                            { value: 25, },
+                            { value: 50, },
+                            { value: 75, },
+                            { value: 100, },
+                        ]}
+                    />
+                </div>
+
+                <Text size="sm" color="dimmed" style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%,-50%)' }}>
+                    {count} Items
                 </Text>
-                <Slider value={value}
-                    onChange={(val) => onSetTextSize(val)}
-                    size="sm"
-                    step={25}
-                    marks={[
-                        { value: 0, },
-                        { value: 25, },
-                        { value: 50, },
-                        { value: 75, },
-                        { value: 100, },
-                    ]}
-                />
+
+
             </div>
 
 

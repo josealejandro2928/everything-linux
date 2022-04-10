@@ -11,6 +11,7 @@ const Toolbar = () => {
     const { colorScheme } = useMantineColorScheme();
     const [openedDrawer, setOpenedDrawer] = useState(false);
 
+
     return <React.Fragment>
         <div className={colorScheme == 'dark' ? 'Toolbar dark' : 'Toolbar light'}>
             <Grid style={{ margin: '0px' }}>

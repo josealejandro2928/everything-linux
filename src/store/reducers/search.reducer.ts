@@ -11,7 +11,15 @@ export interface SearchState {
     levels: number | null | undefined;
   };
   textSize: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-  order: '-name' | '+name' | '-size' | '+size' | '+mimetype' | '-mimetype';
+  order:
+    | '-name'
+    | '+name'
+    | '-size'
+    | '+size'
+    | '+mimetype'
+    | '-mimetype'
+    | '+lastDateModified'
+    | '-lastDateModified';
 }
 /////////////////////////////////////////////////////////////////
 
@@ -26,9 +34,12 @@ export const SET_TEXT_SIZE = 'SET_TEXT_SIZE';
 export const SET_ORDER = 'SET_ORDER';
 
 ///////////////////////////////////////////////////////////
+const loadedDirectory = localStorage.getItem('directory');
+const loadedTextSize = localStorage.getItem('textSize');
+const loadedOrder = localStorage.getItem('order');
 
 const initialState: SearchState = {
-  directory: '/',
+  directory: loadedDirectory ? JSON.parse(loadedDirectory) : '/',
   searchFile: null,
   result: [],
   isSearching: false,
@@ -36,8 +47,8 @@ const initialState: SearchState = {
     hiddenFiles: false,
     levels: null,
   },
-  textSize: 'xs',
-  order: '+name',
+  textSize: loadedTextSize ? JSON.parse(loadedTextSize) : 'xs',
+  order: loadedOrder ? JSON.parse(loadedOrder) : '+name',
 };
 
 const searchReducer = (
@@ -71,7 +82,15 @@ export default searchReducer;
 
 ////////////////////////CUSTOM FUNCTION AND HELPERS ////////////////////////////////
 function _sort(
-  order: '-name' | '+name' | '-size' | '+size' | '+mimetype' | '-mimetype',
+  order:
+    | '-name'
+    | '+name'
+    | '-size'
+    | '+size'
+    | '+mimetype'
+    | '-mimetype'
+    | '+lastDateModified'
+    | '-lastDateModified',
   data: Array<any>
 ) {
   const sense = order.slice(0, 1);
@@ -90,9 +109,10 @@ function _sort(
 }
 
 function _processingSingleFile(file: IFile, data: Array<IFile>, order: string) {
-  let newArray = data.filter((e) => e.name != file.name);
+  let newArray = data.filter((e) => e.path != file.path && e.name != file.name);
   newArray.push(file);
   return _sort(order as any, newArray);
+  // return newArray;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////

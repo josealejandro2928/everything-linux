@@ -2,8 +2,11 @@ export interface IFile {
   name: string;
   path: string;
   isDirectory: string;
-  size: string;
+  size: string | number;
   mimetype: string;
+  lastDateModified: Date | string;
+  id: any;
+  sizeLabel: string;
 }
 
 export interface IRequestSearch {
