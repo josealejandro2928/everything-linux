@@ -8,8 +8,8 @@ console.log("🚀 ~ file: electron.js ~ line 6 ~ isDev", isDev)
 let mainWindow;
 function createWindow() {
     mainWindow = new BrowserWindow({
-        width: 1280,
-        height: 720,
+        width: 1360,
+        height: 800,
         minWidth: 600,
         minHeight: 400,
         webPreferences: {

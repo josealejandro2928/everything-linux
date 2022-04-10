@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useTransition } from 'react';
 import './App.scss';
 import Layout from '../components/layout/layout/Layout';
 import { ColorScheme, ColorSchemeProvider, MantineProvider } from '@mantine/core';
@@ -29,6 +29,7 @@ function App() {
   const isSearching = useSelector((state: State) => state.search.isSearching);
   const mount = useRef<number>(0);
   const dispatch = useDispatch();
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
     if (mount.current < 2) {
@@ -41,7 +42,9 @@ function App() {
 
   useEffect(() => {
     ipcRenderer.on('found-result', (_: any, data: { data: IFile }) => {
-      dispatch(setNewResult(data.data));
+      startTransition(() => {
+        dispatch(setNewResult(data.data));
+      })
     });
   }, [])
 
@@ -50,10 +53,6 @@ function App() {
       dispatch(setIsSearching(false));
     });
   }, [])
-
-  useEffect(() => {
-    console.log(isSearching);
-  }, [isSearching])
 
   async function onSearch() {
     ipcRenderer.send('stop-current-search');

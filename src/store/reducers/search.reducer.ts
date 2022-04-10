@@ -34,7 +34,7 @@ const initialState: SearchState = {
     hiddenFiles: false,
     levels: null,
   },
-  textSize: 'sm',
+  textSize: 'xs',
 };
 
 const searchReducer = (

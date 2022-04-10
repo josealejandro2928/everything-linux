@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { ScrollArea, Table, Text } from '@mantine/core';
 import { useSelector } from 'react-redux';
 import { ArrowNarrowUp } from 'tabler-icons-react';
 import { State } from '../../../store/reducers';
 import './DataTable.scss'
 
-const DataTable = () => {
+const DataTable = memo(() => {
     const elements = useSelector((state: State) => state.search.result);
     const textSize = useSelector((state: State) => state.search.textSize)
     // console.log("🚀 ~ file: DataTable.tsx ~ line 10 ~ DataTable ~ elements", elements)
@@ -78,6 +78,6 @@ const DataTable = () => {
             </ScrollArea>
         </div >
     )
-}
+});
 
 export default DataTable;
