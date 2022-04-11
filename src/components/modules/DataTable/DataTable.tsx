@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useEffect, useMemo, useTransition } from 'react';
+import React, { memo, useTransition } from 'react';
 import { ScrollArea, Table, Text, Tooltip } from '@mantine/core';
 import { useDispatch, useSelector } from 'react-redux';
 import { ArrowNarrowDown, ArrowNarrowUp } from 'tabler-icons-react';
@@ -7,6 +7,7 @@ import './DataTable.scss'
 import { setOrder } from '../../../store/actions/search.actions';
 import usePersistData from '../../../hooks/usePersistData';
 import { useInView } from "react-intersection-observer";
+
 
 const DataTable = memo(() => {
     const elements = useSelector((state: State) => state.search.result);
@@ -106,7 +107,11 @@ const RowTable = memo(({ name, sizeLabel, mimetype, lastDateModified, path, text
             <td>
                 <Tooltip label={name}>
                     <Text size={textSize} lineClamp={2}>
-                        {name}
+                        <div style={{ 'display': 'flex', gap: '8px', justifyContent: 'flex-start', 'alignItems': 'center' }}>
+                            <img height={30} src="/icons/icons/folder.svg" />
+                            {name}
+                        </div>
+
                     </Text>
                 </Tooltip>
             </td>

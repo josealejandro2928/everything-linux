@@ -40,6 +40,22 @@ function searchDir() {
 
 }
 
-module.exports = {
-    searchDir
+function bindIcons() {
+    try {
+        let uri = '/media/jose/DATA/03-CODING/Electron/everything-linux/public/icons';
+        let icons = fs.readdirSync(uri, { withFileTypes: true });
+        let data = []
+        for (let icon of icons) {
+            data.push({ name: icon.name, path: `/icons/${icon.name}` })
+        }
+        fs.writeFileSync(path.join(__dirname, 'icon-data.json'), JSON.stringify(data), { encoding: 'utf-8' });
+    } catch (e) {
+        console.log(e);
+    }
 }
+
+// module.exports = {
+//     searchDir
+// }
+
+bindIcons();
