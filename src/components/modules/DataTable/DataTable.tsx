@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useMemo, useTransition } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useTransition } from 'react';
 import { ScrollArea, Table, Text, Tooltip } from '@mantine/core';
 import { useDispatch, useSelector } from 'react-redux';
 import { ArrowNarrowDown, ArrowNarrowUp } from 'tabler-icons-react';
@@ -6,7 +6,7 @@ import { State } from '../../../store/reducers';
 import './DataTable.scss'
 import { setOrder } from '../../../store/actions/search.actions';
 import usePersistData from '../../../hooks/usePersistData';
-import path from 'path';
+import { useInView } from "react-intersection-observer";
 
 const DataTable = memo(() => {
     const elements = useSelector((state: State) => state.search.result);
@@ -70,15 +70,17 @@ const DataTable = memo(() => {
     );
 
     const rows = elements.map((element) => (
-        <RowTable
-            key={element.id}
-            name={element.name}
-            path={element.path}
-            mimetype={element.mimetype}
-            sizeLabel={element.sizeLabel}
-            lastDateModified={element.lastDateModified}
-            textSize={textSize}
-        />
+        <VirtualScrollChild height={32}>
+            <RowTable
+                key={element.id}
+                name={element.name}
+                path={element.path}
+                mimetype={element.mimetype}
+                sizeLabel={element.sizeLabel}
+                lastDateModified={element.lastDateModified}
+                textSize={textSize}
+            />
+        </VirtualScrollChild>
     ));
 
     return (
@@ -100,7 +102,7 @@ const DataTable = memo(() => {
 
 const RowTable = memo(({ name, sizeLabel, mimetype, lastDateModified, path, textSize }: any) => {
     return (
-        <tr>
+        <>
             <td>
                 <Tooltip label={name}>
                     <Text size={textSize} lineClamp={2}>
@@ -136,7 +138,27 @@ const RowTable = memo(({ name, sizeLabel, mimetype, lastDateModified, path, text
                     </Text>
                 </Tooltip>
             </td>
-        </tr>
+        </>
     )
 });
+
+/**
+ * A wrapper component for children of
+ * VirtualScroll. Computes inline style and
+ * handles whether to display props.children.
+ */
+function VirtualScrollChild({ height, children }: { height: any, children: any }) {
+    const [ref, inView] = useInView();
+    // console.log("🚀 ~ file: DataTable.tsx ~ line 152 ~ VirtualScrollChild ~ inView", inView)
+    const style = {
+        height: `${height}px`,
+        overflow: 'hidden'
+    };
+    return (
+        <tr style={style} ref={ref}>
+            {inView ? children : null}
+        </tr>
+    );
+}
+
 export default DataTable;
