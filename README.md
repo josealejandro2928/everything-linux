@@ -3,4 +3,4 @@
 
 ![Image 1](https://ngp-image-picker.surge.sh/assets/images/everything-linux-1.jpeg)
 
-![Image 2](https://ngp-image-picker.surge.sh/assets/images/1.png.everything-linux-2.png)
+![Image 2](https://ngp-image-picker.surge.sh/assets/images/everything-linux-2.png)
