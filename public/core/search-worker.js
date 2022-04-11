@@ -121,16 +121,16 @@ function getMedataFile(res, fullPath, isDirectory, fileStats) {
     }
     //////////////HELPERS///////////////////////
     function getDateModified(date) {
-        // date = new Date(date);
-        let dd = parseTwoDigits(date.getDay());
-        let mm = parseTwoDigits(date.getMonth());
+        date = new Date(date);
+        let dd = parseTwoDigits(date.getDate());
+        let mm = parseTwoDigits(date.getMonth() + 1);
         let yyyy = parseTwoDigits(date.getFullYear());
         let hh = parseTwoDigits(date.getHours());
-        let ss = parseTwoDigits(date.getSeconds());
+        let mmm = parseTwoDigits(date.getMinutes());
         function parseTwoDigits(x) {
             return x < 10 ? `0${x}` : x;
         }
-        return `${dd}/${mm}/${yyyy} ${hh}:${ss}`;
+        return `${dd}/${mm}/${yyyy} ${hh}:${mmm}`;
     }
     ////////////////////////////////////////////
 }

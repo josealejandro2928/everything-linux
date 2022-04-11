@@ -6,7 +6,7 @@ const LoadingSearch = memo(({ opened = false, setOpened = () => { } }:
     { opened: boolean; setOpened: Function }) => {
     return <div>
         <Dialog
-            style={{ padding: '16px 16px', right: '0px', bottom: '0px' }}
+            style={{ padding: '16px 16px', right: '-12px', bottom: '36px' }}
             opened={opened}
             size="sm"
             radius="md"

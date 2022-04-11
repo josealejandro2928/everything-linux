@@ -2,8 +2,7 @@ console.log("Cargo el core");
 
 const path = require('path');
 const { ipcMain } = require('electron')
-const Search = require('./search');
-const searchObject = new Search();
+const { searchDir } = require('./helpers')
 const { Worker } = require('worker_threads');
 
 let worker;
@@ -57,11 +56,8 @@ ipcMain.on('search', async (event, arg) => {
 })
 
 ipcMain.on('root-dir', (event, _) => {
-    let result = searchObject.search(null, '', { reportFound: false }, event) || [];
-    searchObject.setStopped(false);
-    result = result.filter((el) => el.isDirectory);
-    result.unshift({ name: 'Computer', path: '/', isDirectory: true })
-    event.reply('root-dir-result', { data: result })
+    let results = searchDir();
+    event.reply('root-dir-result', { data: results })
 })
 
 // eslint-disable-next-line no-unused-vars
@@ -71,5 +67,4 @@ ipcMain.on('stop-current-search', async (event, _) => {
         worker.removeAllListeners();
         await worker?.terminate();
     }
-    searchObject.setStopped(true);
 })
