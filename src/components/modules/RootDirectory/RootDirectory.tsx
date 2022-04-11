@@ -29,7 +29,7 @@ const RootDirectory = () => {
             label: el.path,
             value: el.path,
             description: el.name,
-            image: el.isDirectory ? <Folder /> : ''
+            image: el.icon
         }
     })
 
@@ -62,10 +62,10 @@ const SelectItem = forwardRef<HTMLDivElement, any>(
     ({ image, label, description, ...others }: any, ref) => (
         <div ref={ref} {...others}>
             <Group noWrap>
-                {image}
+                <img height={30} src={image} />
                 <div>
-                    <Text size="sm">{description}</Text>
-                    <Text size="xs" color="dimmed">
+                    <Text lineClamp={1} size="sm">{description}</Text>
+                    <Text lineClamp={1} size="xs" color="dimmed">
                         {label}
                     </Text>
                 </div>

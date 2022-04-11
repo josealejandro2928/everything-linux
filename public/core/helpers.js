@@ -16,7 +16,7 @@ function searchDir() {
             if (a.name < b.name) return -1;
             return 0;
         })
-        result.unshift({ name: 'Computer', path: '/', isDirectory: true });
+        result.unshift({ name: 'Computer', path: '/', isDirectory: true, icon: '/icons/folder.svg' });
         return result;
     } catch (e) {
         console.log("Error", e);
@@ -30,7 +30,9 @@ function searchDir() {
             try {
                 isDirectory = fs.lstatSync(path.join(uri, el.name)).isDirectory();
                 if (isDirectory) {
-                    result.push({ name: el.name, path: path.join(uri, el.name), isDirectory })
+                    let item = { name: el.name, path: path.join(uri, el.name), isDirectory, mimetype: 'folder' };
+                    item.icon = '/icons/folder.svg';
+                    result.push(item);
                 }
             } catch (e) {
                 continue
@@ -95,8 +97,9 @@ function getIcon(meta) {
         "bin": "hex",
         "apk": "android",
         "sh": "console",
-        "php":"php",
-        "class":"java"
+        "php": "php",
+        "class": "java",
+        "srt": "text"
 
     }
 
