@@ -52,11 +52,11 @@ const DataTable = memo(() => {
                     {order == '+mimetype' && <ArrowNarrowDown></ArrowNarrowDown>}
                 </i>
             </th>
-            <th onClick={() => onSetOrder('lastDateModified')} className='th' style={{ width: '15%' }}>
+            <th onClick={() => onSetOrder('mtime')} className='th' style={{ width: '15%' }}>
                 Date Modified
-                <i style={{ opacity: order.includes('lastDateModified') ? 1 : 0 }}>
-                    {order == '-lastDateModified' && <ArrowNarrowUp></ArrowNarrowUp>}
-                    {order == '+lastDateModified' && <ArrowNarrowDown></ArrowNarrowDown>}
+                <i style={{ opacity: order.includes('mtime') ? 1 : 0 }}>
+                    {order == '-mtime' && <ArrowNarrowUp></ArrowNarrowUp>}
+                    {order == '+mtime' && <ArrowNarrowDown></ArrowNarrowDown>}
                 </i>
             </th>
             <th className='th' style={{ width: '40%' }}>
@@ -71,10 +71,11 @@ const DataTable = memo(() => {
     );
 
     const rows = elements.map((element) => (
-        <VirtualScrollChild height={32}>
+        <VirtualScrollChild height={28}>
             <RowTable
                 key={element.id}
                 name={element.name}
+                icon={element.icon}
                 path={element.path}
                 mimetype={element.mimetype}
                 sizeLabel={element.sizeLabel}
@@ -101,14 +102,14 @@ const DataTable = memo(() => {
 });
 
 
-const RowTable = memo(({ name, sizeLabel, mimetype, lastDateModified, path, textSize }: any) => {
+const RowTable = memo(({ name, sizeLabel, mimetype, lastDateModified, path, icon, textSize }: any) => {
     return (
         <>
             <td>
                 <Tooltip label={name}>
                     <Text size={textSize} lineClamp={2}>
                         <div style={{ 'display': 'flex', gap: '8px', justifyContent: 'flex-start', 'alignItems': 'center' }}>
-                            <img height={30} src="/icons/icons/folder.svg" />
+                            <img height={30} src={icon} />
                             {name}
                         </div>
 

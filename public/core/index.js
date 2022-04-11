@@ -5,6 +5,7 @@ const { ipcMain } = require('electron')
 const { searchDir } = require('./helpers')
 const { Worker } = require('worker_threads');
 
+
 let worker;
 
 ipcMain.on('search', async (event, arg) => {

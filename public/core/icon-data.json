@@ -724,6 +724,7 @@
   { "name": "test-jsx.svg", "path": "/icons/test-jsx.svg" },
   { "name": "test-ts.svg", "path": "/icons/test-ts.svg" },
   { "name": "tex.svg", "path": "/icons/tex.svg" },
+  { "name": "text.svg", "path": "/icons/text.svg" },
   { "name": "textlint.svg", "path": "/icons/textlint.svg" },
   { "name": "tilt.svg", "path": "/icons/tilt.svg" },
   { "name": "tobi.svg", "path": "/icons/tobi.svg" },

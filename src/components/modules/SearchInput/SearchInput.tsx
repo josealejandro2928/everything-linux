@@ -13,7 +13,7 @@ const SearchInput = () => {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        let isBigEnough = value?.trim()?.length > 2;
+        let isBigEnough = value?.trim()?.length >= 2;
         if (isBigEnough || !value)
             dispatch(setSearchFile(debounced));
     }, [debounced])

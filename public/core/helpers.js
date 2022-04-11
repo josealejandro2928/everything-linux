@@ -2,6 +2,7 @@
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
+const icons = require('./icon-data.json');
 
 function searchDir() {
     try {
@@ -54,8 +55,81 @@ function bindIcons() {
     }
 }
 
-// module.exports = {
-//     searchDir
-// }
+function getIcon(meta) {
+    const cache = {
+        "ts": "typescript",
+        "tsx": "react_ts",
+        "jsx": "react",
+        "py": "python",
+        "pyc": "python",
+        "ppt": "powerpoint",
+        "pptx": "powerpoint",
+        "doc": "word",
+        "docx": "word",
+        "c": "c",
+        "h": "c",
+        "cpp": "cpp",
+        "jar": "jar",
+        "m": "matlab",
+        "hbs": "handlebars",
+        "tex": "tex",
+        "txt": "document",
+        "MD": "document",
+        "md": "document",
+        "gz": "zip",
+        "z": "zip",
+        "rpm": "zip",
+        "deb": "folder-components",
+        "pkg": "folder-components",
+        "rar": "zar",
+        "xlsx": "table",
+        "xlsm": "table",
+        "xlsb": "table",
+        "csv": "table",
+        "rb": "ruby",
+        "db": "database",
+        "sql": "database",
+        "log": "log",
+        "iso": "disc",
+        "dmg": "disc",
+        "bin": "hex",
+        "apk": "android",
+        "sh": "console",
+        "php":"php",
+        "class":"java"
 
-bindIcons();
+    }
+
+
+    let icon = icons.find((e) => {
+        let name = e.name.split('.')[0];
+        try {
+            let temp = meta.name.split('.');
+            let extention = temp[temp.length - 1];
+            if (meta.mimetype == 'folder') {
+                return meta.mimetype == name;
+            }
+            if (extention in cache) {
+                return name == cache[extention]
+            }
+            let part1 = meta.mimetype.split('/')?.[0];
+            if (!part1) return name == 'file';
+            let part2 = meta.mimetype.split('/')?.[1];
+            return part1 == name || part2 == name;
+        } catch (e) {
+            return name == 'file';
+        }
+    })
+
+    if (!icon)
+        icons.find((e) => e.name == 'file.svg');
+    return icon;
+
+}
+
+module.exports = {
+    searchDir,
+    getIcon
+
+}
+// bindIcons();

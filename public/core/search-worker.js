@@ -2,7 +2,8 @@
 
 const fs = require('fs');
 const path = require('path');
-const mime = require('mime-types')
+const mime = require('mime-types');
+const { getIcon } = require('./helpers');
 
 const { parentPort, workerData } = require('worker_threads');
 
@@ -115,6 +116,9 @@ function getMedataFile(res, fullPath, isDirectory, fileStats) {
 
         meta.id = `${meta.name}_${meta.path}_${meta.mimetype}_${meta.size}_${fileStats.ino}`;
         meta.lastDateModified = getDateModified(fileStats.mtime);
+        meta.mtime = fileStats.mtime;
+        let icon = getIcon(meta);
+        meta.icon = icon?.path || '';
         return meta;
     } catch (e) {
         return null;
@@ -153,6 +157,10 @@ function filterElement(searchParam, element, parentDir, isDirectory, fileStats) 
     return null
 
 }
+try {
+    search(directories, searchParam, options, null);
+    process.exit(1);
+} catch (err) {
+    process.exit(0);
 
-search(directories, searchParam, options, null);
-process.exit(1);
+}

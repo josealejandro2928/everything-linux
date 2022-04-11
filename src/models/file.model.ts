@@ -7,6 +7,8 @@ export interface IFile {
   lastDateModified: Date | string;
   id: any;
   sizeLabel: string;
+  icon: string;
+  mtime: Date;
 }
 
 export interface IRequestSearch {
