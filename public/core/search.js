@@ -10,7 +10,7 @@ class Search {
     }
 
     search(directories, searchParam = '', options = { hiddenFiles: false, levels: null, reportFound: true }, event) {
-        console.log("********ENTRE EN EL SEARCH********", { directories, searchParam, options }) // prints "ping"
+        // console.log("********ENTRE EN EL SEARCH********", { directories, searchParam, options }) // prints "ping"
         if (this.stopped) return;
         let onlyRoot = false;
 

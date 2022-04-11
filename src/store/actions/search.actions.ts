@@ -30,7 +30,7 @@ export const setIsSearching = (state: boolean) => async (dispatch: Function) => 
   });
 };
 
-export const setNewResult = (data: IFile) => async (dispatch: Function) => {
+export const setNewResult = (data: IFile | Array<File>) => async (dispatch: Function) => {
   return dispatch({
     type: SET_NEW_RESULT,
     payload: data,

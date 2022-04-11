@@ -16,8 +16,9 @@ function search(
         levels: null,
         reportFound: true
     },) {
-    console.log("********ENTRE EN EL SEARCH WORKER********", { directories, searchParam, options }) // prints "pin
+    console.log("//////////////////********ENTRE EN EL SEARCH WORKER********////////////////////////", { directories, searchParam, options }) // prints "pin
     let onlyRoot = false;
+
 
     if (!directories || !directories?.length) {
         directories = ['/', '/media'];
@@ -60,7 +61,6 @@ function search(
                 }
                 const found = filterElement(searchParam, element, dir.link, isDirectory, fileStats);
                 if (found) {
-                    // console.log("🚀 ~ file: search.js ~ line 59 ~ filterElement ~ found", found);
                     result.push(found);
                     if (options.reportFound) {
                         parentPort.postMessage(found);
@@ -113,7 +113,7 @@ function getMedataFile(res, fullPath, isDirectory, fileStats) {
             meta.mimetype = 'folder'
         }
 
-        meta.id = fileStats.birthtimeMs;
+        meta.id = `${meta.name}_${meta.path}_${meta.mimetype}_${meta.size}_${fileStats.ino}`;
         meta.lastDateModified = getDateModified(fileStats.mtime);
         return meta;
     } catch (e) {

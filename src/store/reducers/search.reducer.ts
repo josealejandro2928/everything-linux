@@ -62,7 +62,7 @@ const searchReducer = (
     case SET_SEARCH_FILE:
       return { ...state, searchFile: payload };
     case SET_NEW_RESULT:
-      return { ...state, result: _processingSingleFile(payload, state.result, state.order) };
+      return { ...state, result: _processingDataFile(payload, state.result, state.order) };
     case SET_RESULTS:
       return { ...state, result: payload };
     case SET_IS_SERCHING:
@@ -108,9 +108,9 @@ function _sort(
   });
 }
 
-function _processingSingleFile(file: IFile, data: Array<IFile>, order: string) {
-  let newArray = data.filter((e) => e.path != file.path && e.name != file.name);
-  newArray.push(file);
+function _processingDataFile(file: IFile | Array<IFile>, data: Array<IFile>, order: string) {
+  let newChunks:Array<IFile> = file instanceof Array ? file: [file];
+  let newArray = data.concat(newChunks);
   return _sort(order as any, newArray);
   // return newArray;
 }

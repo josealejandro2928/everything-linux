@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useTransition } from 'react';
 import './App.scss';
 import Layout from '../components/layout/layout/Layout';
-import { ColorScheme, ColorSchemeProvider, MantineProvider } from '@mantine/core';
-import { useLocalStorage } from '@mantine/hooks';
+import { ColorScheme, ColorSchemeProvider, Global, MantineProvider } from '@mantine/core';
+import { useLocalStorage, useDebouncedValue } from '@mantine/hooks';
 import DataTable from '../components/modules/DataTable/DataTable';
 import Footer from '../components/layout/Footer/Footer';
 import { useDispatch, useSelector } from 'react-redux';
@@ -13,6 +13,8 @@ import LoadingSearch from '../components/modules/LoadingSearch/LoadingSearch';
 import usePersistData from '../hooks/usePersistData';
 const { ipcRenderer } = window.require('electron');
 
+
+let cache: any = {};
 
 function App() {
   const [colorScheme, setColorScheme] = useLocalStorage<ColorScheme>({
@@ -30,7 +32,12 @@ function App() {
   const isSearching = useSelector((state: State) => state.search.isSearching);
   const mount = useRef<number>(0);
   const dispatch = useDispatch();
-  const [isPending, startTransition] = useTransition();
+  const [_, startTransition] = useTransition();
+  const newFilesComming = useRef<Array<IFile>>([]);
+  const isCollecting = useRef<boolean>(false);
+
+
+
 
   useEffect(() => {
     if (mount.current < 2) {
@@ -43,9 +50,19 @@ function App() {
 
   useEffect(() => {
     ipcRenderer.on('found-result', (_: any, data: { data: IFile }) => {
-      startTransition(() => {
-        dispatch(setNewResult(data.data));
-      })
+      if (cache[data.data.id]) return;
+      cache[data.data.id] = true;
+      newFilesComming.current.push(data.data);
+      if (isCollecting.current) return;
+      isCollecting.current = true;
+      setTimeout(() => {
+        startTransition(() => {
+          dispatch(setNewResult([...newFilesComming.current] as any));
+        })
+        newFilesComming.current = [];
+        cache = {};
+        isCollecting.current = false;
+      }, 500)
     });
   }, [])
 
@@ -59,7 +76,9 @@ function App() {
     ipcRenderer.send('stop-current-search');
     dispatch(setIsSearching(true));
     dispatch(setResults([]));
-    await _delayMs(300);
+    newFilesComming.current = [];
+
+    await _delayMs(150);
     const requestToSearch: IRequestSearch = {
       directories: directory,
       searchParam: searchFile as string,
@@ -83,8 +102,26 @@ function App() {
 
 
   return (
+
+
     <ColorSchemeProvider colorScheme={colorScheme} toggleColorScheme={toggleColorScheme}>
-      <MantineProvider theme={{ colorScheme: colorScheme }} withGlobalStyles>
+
+      <MantineProvider theme={{
+        colorScheme: colorScheme,
+        fontFamily: `'Ubuntu', 'Droid Sans', 'Helvetica Neue', sans-serif`,
+        colors: {
+          dark: ["#FFF",
+            "#A6A7AB",
+            "#909296",
+            "#5C5F66",
+            "#373A40",
+            "#2C2E33",
+            "#25262B",
+            "#1A1B1E",
+            "#141517",
+            "#101113"]
+        }
+      }} withGlobalStyles>
         <div className="App">
           <Layout>
             <DataTable></DataTable>
@@ -93,7 +130,9 @@ function App() {
         </div>
         <LoadingSearch opened={isSearching} setOpened={onStopCurrentSearch} />
       </MantineProvider>
-    </ColorSchemeProvider>
+    </ColorSchemeProvider >
+
+
   );
 }
 

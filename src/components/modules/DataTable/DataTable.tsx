@@ -6,6 +6,7 @@ import { State } from '../../../store/reducers';
 import './DataTable.scss'
 import { setOrder } from '../../../store/actions/search.actions';
 import usePersistData from '../../../hooks/usePersistData';
+import path from 'path';
 
 const DataTable = memo(() => {
     const elements = useSelector((state: State) => state.search.result);
@@ -68,45 +69,16 @@ const DataTable = memo(() => {
         </tr>
     );
 
-    const rows = elements.map((element, index) => (
-        <tr key={element.path + element.name + index}>
-            <td>
-                <Tooltip label={element.name}>
-                    <Text size={textSize} lineClamp={2}>
-                        {element.name}
-                    </Text>
-                </Tooltip>
-            </td>
-            <td>
-
-                <Text size={textSize} lineClamp={1}>
-                    {element.sizeLabel}
-                </Text>
-
-            </td>
-            <td>
-                <Tooltip label={element.mimetype}>
-                    <Text size={textSize} lineClamp={1}>
-                        {element.mimetype}
-                    </Text>
-                </Tooltip>
-            </td>
-            <td>
-
-                <Text size={textSize} lineClamp={1}>
-                    {element.lastDateModified as Date}
-                </Text>
-
-            </td>
-            <td>
-                <Tooltip label={element.path}>
-                    <Text size={textSize} lineClamp={1}>
-                        {element.path}
-                    </Text>
-                </Tooltip>
-            </td>
-
-        </tr>
+    const rows = elements.map((element) => (
+        <RowTable
+            key={element.id}
+            name={element.name}
+            path={element.path}
+            mimetype={element.mimetype}
+            sizeLabel={element.sizeLabel}
+            lastDateModified={element.lastDateModified}
+            textSize={textSize}
+        />
     ));
 
     return (
@@ -125,4 +97,46 @@ const DataTable = memo(() => {
     )
 });
 
+
+const RowTable = memo(({ name, sizeLabel, mimetype, lastDateModified, path, textSize }: any) => {
+    return (
+        <tr>
+            <td>
+                <Tooltip label={name}>
+                    <Text size={textSize} lineClamp={2}>
+                        {name}
+                    </Text>
+                </Tooltip>
+            </td>
+            <td>
+
+                <Text size={textSize} lineClamp={1}>
+                    {sizeLabel}
+                </Text>
+
+            </td>
+            <td>
+                <Tooltip label={mimetype}>
+                    <Text size={textSize} lineClamp={1}>
+                        {mimetype}
+                    </Text>
+                </Tooltip>
+            </td>
+            <td>
+
+                <Text size={textSize} lineClamp={1}>
+                    {lastDateModified as Date}
+                </Text>
+
+            </td>
+            <td>
+                <Tooltip label={path}>
+                    <Text size={textSize} lineClamp={1}>
+                        {path}
+                    </Text>
+                </Tooltip>
+            </td>
+        </tr>
+    )
+});
 export default DataTable;
