@@ -99,7 +99,8 @@ function getIcon(meta) {
         "sh": "console",
         "php": "php",
         "class": "java",
-        "srt": "text"
+        "srt": "text",
+        "swf":"video"
 
     }
 

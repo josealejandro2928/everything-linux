@@ -6,11 +6,16 @@ import { Menu2 } from 'tabler-icons-react';
 import RootDirectory from '../../modules/RootDirectory/RootDirectory';
 import SearchInput from '../../modules/SearchInput/SearchInput';
 import Settings from '../../modules/Settings/Settings';
+import { useDispatch, useSelector } from 'react-redux';
+import { State } from '../../../store/reducers';
+import { setOptions } from '../../../store/actions/search.actions';
 
 
 const Toolbar = () => {
     const { colorScheme } = useMantineColorScheme();
     const [openedDrawer, setOpenedDrawer] = useState(false);
+    const settings = useSelector((state: State) => state.settings);
+    const dispatch = useDispatch();
 
 
     return <React.Fragment>
@@ -42,7 +47,10 @@ const Toolbar = () => {
             </Grid>
             <Drawer
                 opened={openedDrawer}
-                onClose={() => setOpenedDrawer(false)}
+                onClose={() => {
+                    setOpenedDrawer(false)
+                    dispatch(setOptions({ ...settings }))
+                }}
                 title="Settings"
                 padding="md"
                 size="md"

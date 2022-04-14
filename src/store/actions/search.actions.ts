@@ -7,6 +7,7 @@ import {
   SET_RESULTS,
   SET_TEXT_SIZE,
   SET_ORDER,
+  SET_OPTIONS,
 } from '../reducers/search.reducer';
 
 export const setSearchFile = (searchStr: string) => async (dispatch: Function) => {
@@ -58,5 +59,19 @@ export const setOrder =
     return dispatch({
       type: SET_ORDER,
       payload: data,
+    });
+  };
+
+export const setOptions =
+  (options: {
+    hiddenFiles?: boolean;
+    levels?: number | null | undefined;
+    selectedFileTypes: Array<string>;
+    avoidFiles: Array<string>;
+  }) =>
+  async (dispatch: Function) => {
+    return dispatch({
+      type: SET_OPTIONS,
+      payload: options,
     });
   };

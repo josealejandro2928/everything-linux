@@ -82,7 +82,8 @@ const Filters = () => {
                     { value: '0', label: 'Full' },
                     { value: '2', label: '2 levels' },
                     { value: '4', label: '4 levels' },
-                    { value: '10', label: '10 levels' },
+                    { value: '8', label: '8 levels' },
+                    { value: '16', label: '16 levels' },
                     { value: '32', label: '32 levels' },
                 ]}
             />

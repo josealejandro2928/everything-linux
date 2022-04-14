@@ -9,6 +9,8 @@ export interface SearchState {
   options: {
     hiddenFiles: boolean;
     levels: number | null | undefined;
+    selectedFileTypes: Array<string>;
+    avoidFiles: Array<string>;
   };
   textSize: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   order:
@@ -32,11 +34,15 @@ export const SET_RESULTS = 'SET_RESULTS';
 export const SET_IS_SERCHING = 'SET_IS_SERCHING';
 export const SET_TEXT_SIZE = 'SET_TEXT_SIZE';
 export const SET_ORDER = 'SET_ORDER';
+export const SET_OPTIONS = 'SET_OPTIONS';
 
 ///////////////////////////////////////////////////////////
 const loadedDirectory = localStorage.getItem('directory');
 const loadedTextSize = localStorage.getItem('textSize');
 const loadedOrder = localStorage.getItem('order');
+const loadedAvoidFiles = localStorage.getItem('avoidFiles') || '[]';
+const loadedHiddenFiles = localStorage.getItem('hiddenFiles');
+const loadedLevels = localStorage.getItem('levels');
 
 const initialState: SearchState = {
   directory: loadedDirectory ? JSON.parse(loadedDirectory) : '/',
@@ -44,8 +50,10 @@ const initialState: SearchState = {
   result: [],
   isSearching: false,
   options: {
-    hiddenFiles: false,
-    levels: null,
+    hiddenFiles: loadedHiddenFiles ? JSON.parse(loadedHiddenFiles) : false,
+    levels: loadedLevels ? JSON.parse(loadedLevels) : 0,
+    selectedFileTypes: [],
+    avoidFiles: JSON.parse(loadedAvoidFiles),
   },
   textSize: loadedTextSize ? JSON.parse(loadedTextSize) : 'xs',
   order: loadedOrder ? JSON.parse(loadedOrder) : '+name',
@@ -73,6 +81,8 @@ const searchReducer = (
     case SET_ORDER:
       const order = payload;
       return { ...state, order: order, result: _sort(order, state.result) };
+    case SET_OPTIONS:
+      return { ...state, options: { ...state.options, ...payload } };
     default:
       return state;
   }
@@ -109,7 +119,7 @@ function _sort(
 }
 
 function _processingDataFile(file: IFile | Array<IFile>, data: Array<IFile>, order: string) {
-  let newChunks:Array<IFile> = file instanceof Array ? file: [file];
+  let newChunks: Array<IFile> = file instanceof Array ? file : [file];
   let newArray = data.concat(newChunks);
   return _sort(order as any, newArray);
   // return newArray;
