@@ -2,4 +2,23 @@
     .tab-pp .header {
         border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
     }
+
+    .setting-item {
+        padding: 0.5rem 0rem;
+        border-bottom: 1px solid rgba(255, 255, 255, .2);
+        position: relative;
+
+        ._icon {
+            position: absolute;
+            right: 0;
+            top: 8px;
+            opacity: .75;
+            cursor: pointer;
+
+            .icon {
+                height: 20px;
+                width: 20px;
+            }
+        }
+    }
 }
