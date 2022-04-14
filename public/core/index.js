@@ -20,6 +20,7 @@ ipcMain.on('search', async (event, arg) => {
         }
 
         worker = new Worker(path.join(__dirname, 'search-worker.js'), {
+            execArgv: [...process.execArgv, '--unhandled-rejections=strict'],
             workerData: {
                 directories,
                 searchParam,

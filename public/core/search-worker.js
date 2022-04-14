@@ -60,7 +60,7 @@ function search(
                 } catch (e) {
                     continue
                 }
-                const found = filterElement(searchParam, element, dir.link, isDirectory, fileStats);
+                const found = filterElement(searchParam, element, dir.link, isDirectory, fileStats, options);
                 if (found) {
                     result.push(found);
                     if (options.reportFound) {
@@ -139,14 +139,15 @@ function getMedataFile(res, fullPath, isDirectory, fileStats) {
     ////////////////////////////////////////////
 }
 
-function filterElement(searchParam, element, parentDir, isDirectory, fileStats) {
+function filterElement(searchParam, element, parentDir, isDirectory, fileStats, options) {
 
     const elementName = element.name.toLowerCase().trim();
     let searchItem = searchParam.toLowerCase().trim();
     let indexSearch = null;
 
-    if (searchItem[0] == '/' && searchItem[searchItem.length - 1] == '/') {
-        indexSearch = elementName.search(searchItem);
+    if (options.isRegex) {
+        let re = new RegExp(searchItem);
+        indexSearch = elementName.search(re);
     } else {
         indexSearch = elementName.includes(searchItem);
     }

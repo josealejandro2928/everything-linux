@@ -13,15 +13,14 @@ const DataTable = memo(() => {
     const elements = useSelector((state: State) => state.search.result);
     const textSize = useSelector((state: State) => state.search.textSize);
     const order = usePersistData(useSelector((state: State) => state.search.order), { key: 'order' });
+    const totalItems = useSelector((state: State) => state.search.result.length);
     const [_, startTransition] = useTransition();
     const dispatch = useDispatch();
 
     function onSetOrder(type: string) {
-        // console.log("type: ", type)
         startTransition(() => {
             if (order.includes(type)) {
                 const newOrder = order == `-${type}` ? `+${type}` : `-${type}`;
-                // console.log("newOrder", newOrder)
                 dispatch(setOrder(`${newOrder}` as any))
             } else {
                 dispatch(setOrder(`-${type}` as any))
@@ -71,7 +70,7 @@ const DataTable = memo(() => {
     );
 
     const rows = elements.map((element) => (
-        <VirtualScrollChild height={28}>
+        <VirtualScrollChild height={28} total={totalItems}>
             <RowTable
                 key={element.id}
                 name={element.name}
@@ -153,7 +152,7 @@ const RowTable = memo(({ name, sizeLabel, mimetype, lastDateModified, path, icon
  * VirtualScroll. Computes inline style and
  * handles whether to display props.children.
  */
-function VirtualScrollChild({ height, children }: { height: any, children: any }) {
+function VirtualScrollChild({ height, children, total = 50 }: { height: any, children: any, total: number }) {
     const [ref, inView] = useInView();
     // console.log("🚀 ~ file: DataTable.tsx ~ line 152 ~ VirtualScrollChild ~ inView", inView)
     const style = {
@@ -162,7 +161,7 @@ function VirtualScrollChild({ height, children }: { height: any, children: any }
     };
     return (
         <tr style={style} ref={ref}>
-            {inView ? children : null}
+            {(inView || total < 80) ? children : null}
         </tr>
     );
 }

@@ -5,6 +5,7 @@ import "./Toolbar.scss"
 import { Menu2 } from 'tabler-icons-react';
 import RootDirectory from '../../modules/RootDirectory/RootDirectory';
 import SearchInput from '../../modules/SearchInput/SearchInput';
+import Settings from '../../modules/Settings/Settings';
 
 
 const Toolbar = () => {
@@ -42,12 +43,12 @@ const Toolbar = () => {
             <Drawer
                 opened={openedDrawer}
                 onClose={() => setOpenedDrawer(false)}
-                title="Filters"
+                title="Settings"
                 padding="md"
                 size="md"
                 position="right"
             >
-                {/* Drawer content */}
+                <Settings />
             </Drawer>
         </div>
         <div style={{ 'height': '64px' }}></div>
