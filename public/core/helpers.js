@@ -65,7 +65,9 @@ function getIcon(meta) {
         "py": "python",
         "pyc": "python",
         "ppt": "powerpoint",
+        "PPT": "powerpoint",
         "pptx": "powerpoint",
+        "pps": "powerpoint",
         "doc": "word",
         "docx": "word",
         "c": "c",
@@ -80,14 +82,17 @@ function getIcon(meta) {
         "md": "document",
         "gz": "zip",
         "z": "zip",
+        "7z": "zip",
         "rpm": "zip",
         "deb": "folder-components",
         "pkg": "folder-components",
-        "rar": "zar",
+        "rar": "zip",
         "xlsx": "table",
         "xlsm": "table",
         "xlsb": "table",
         "csv": "table",
+        "ods": "table",
+        "xls": "table",
         "rb": "ruby",
         "db": "database",
         "sql": "database",
@@ -100,7 +105,8 @@ function getIcon(meta) {
         "php": "php",
         "class": "java",
         "srt": "text",
-        "swf":"video"
+        "swf":"video",
+        "dat":"hex"
 
     }
 

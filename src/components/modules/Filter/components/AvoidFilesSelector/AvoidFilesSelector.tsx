@@ -7,7 +7,8 @@ const defaultAvoidFiles = [
     'node_modules',
     'env',
     '$Recycle.Bin',
-    'Windows'
+    'Windows',
+    '__pycache__'
 ]
 
 const AvoidFilesSelector = ({ selectedAvoidFiles, setSelectedAvoidFiles }:

@@ -1,4 +1,4 @@
-import React, { memo, useTransition } from 'react';
+import React, { memo, useEffect, useRef, useTransition } from 'react';
 import { ScrollArea, Table, Text, Tooltip } from '@mantine/core';
 import { useDispatch, useSelector } from 'react-redux';
 import { ArrowNarrowDown, ArrowNarrowUp } from 'tabler-icons-react';
@@ -12,6 +12,7 @@ import { useInView } from "react-intersection-observer";
 const DataTable = memo(() => {
     const elements = useSelector((state: State) => state.search.result);
     const textSize = useSelector((state: State) => state.search.textSize);
+    const searchFile = useSelector((state: State) => state.search.searchFile);
     const order = usePersistData(useSelector((state: State) => state.search.order), { key: 'order' });
     const totalItems = useSelector((state: State) => state.search.result.length);
     const [_, startTransition] = useTransition();
@@ -80,6 +81,7 @@ const DataTable = memo(() => {
                 sizeLabel={element.sizeLabel}
                 lastDateModified={element.lastDateModified}
                 textSize={textSize}
+                searchFile={searchFile}
             />
         </VirtualScrollChild>
     ));
@@ -101,7 +103,8 @@ const DataTable = memo(() => {
 });
 
 
-const RowTable = memo(({ name, sizeLabel, mimetype, lastDateModified, path, icon, textSize }: any) => {
+const RowTable = memo(({ name, sizeLabel, mimetype, lastDateModified, path, icon, textSize, searchFile }: any) => {
+    const showHighLight = useSelector((state: State) => state.settings.showHighLight)
     return (
         <>
             <td>
@@ -109,7 +112,10 @@ const RowTable = memo(({ name, sizeLabel, mimetype, lastDateModified, path, icon
                     <Text size={textSize} lineClamp={2}>
                         <div style={{ 'display': 'flex', gap: '8px', justifyContent: 'flex-start', 'alignItems': 'center' }}>
                             <img height={30} src={icon} />
-                            {name}
+                            <HighLight show={showHighLight} searchText={searchFile}>
+                                {name}
+                            </HighLight>
+
                         </div>
 
                     </Text>
@@ -152,7 +158,7 @@ const RowTable = memo(({ name, sizeLabel, mimetype, lastDateModified, path, icon
  * VirtualScroll. Computes inline style and
  * handles whether to display props.children.
  */
-function VirtualScrollChild({ height, children, total = 50 }: { height: any, children: any, total: number }) {
+const VirtualScrollChild = memo(({ height, children, total = 50 }: { height: any, children: any, total: number }) => {
     const [ref, inView] = useInView();
     // console.log("🚀 ~ file: DataTable.tsx ~ line 152 ~ VirtualScrollChild ~ inView", inView)
     const style = {
@@ -164,6 +170,33 @@ function VirtualScrollChild({ height, children, total = 50 }: { height: any, chi
             {(inView || total < 80) ? children : null}
         </tr>
     );
-}
+})
+
+const HighLight = memo(({ children, show = false, searchText = '' }:
+    { children: any, show: boolean, searchText: string }) => {
+    let element = useRef<any>(null)
+
+    useEffect(() => {
+        if (show && searchText && element.current) {
+            let text = element.current.innerHTML as string;
+            let re = new RegExp(searchText, "gi");
+            let newText = text.match(re)?.map((e) => {
+                return text.replace(e, `<mark>${e}</mark>`)
+            }).join('');
+            if (newText)
+                element.current.innerHTML = newText;
+        }
+    }, [show, searchText, element.current])
+    return (
+        <React.Fragment>
+            {(!show || !searchText) &&
+                <>{children}</>
+            }
+            {show && searchText &&
+                <span ref={element}>{children}</span>
+            }
+        </React.Fragment>
+    );
+})
 
 export default DataTable;

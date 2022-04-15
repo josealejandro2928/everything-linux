@@ -9,14 +9,25 @@ import Settings from '../../modules/Settings/Settings';
 import { useDispatch, useSelector } from 'react-redux';
 import { State } from '../../../store/reducers';
 import { setOptions } from '../../../store/actions/search.actions';
+import { isObjectEquals } from '../../../functions';
 
 
 const Toolbar = () => {
     const { colorScheme } = useMantineColorScheme();
     const [openedDrawer, setOpenedDrawer] = useState(false);
     const settings = useSelector((state: State) => state.settings);
+    const options = useSelector((state: State) => state.search.options);
     const dispatch = useDispatch();
 
+    const onUpdateOprions = () => {
+        let newSettings: any = { ...settings };
+        delete newSettings.showHighLight;
+
+
+        if (!isObjectEquals(newSettings, options))
+            dispatch(setOptions({ ...newSettings }));
+
+    }
 
     return <React.Fragment>
         <div className={colorScheme == 'dark' ? 'Toolbar dark' : 'Toolbar light'}>
@@ -49,7 +60,7 @@ const Toolbar = () => {
                 opened={openedDrawer}
                 onClose={() => {
                     setOpenedDrawer(false)
-                    dispatch(setOptions({ ...settings }))
+                    onUpdateOprions();
                 }}
                 title="Settings"
                 padding="md"

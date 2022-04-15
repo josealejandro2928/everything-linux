@@ -188,7 +188,16 @@ function filterElement(searchParam, element, parentDir, isDirectory, fileStats, 
 function filterTypes(types, name = '') {
     let cacheRegex = {
         "image": (/\.(apng|gif|jpe?g|tiff?|png|webp|bmp|avif|svg|ico|cur)$/i),
-        "video": (/\.(mov|avi|mpeg|mkv|mp4|wmv|avchd|flv|f4v|swf|webm|mpeg-2)$/i)
+        "video": (/\.(mov|avi|mpeg|mkv|mp4|wmv|avchd|flv|f4v|swf|webm|mpeg-2)$/i),
+        "audio": (/\.(aif|cda|mid|mp3|mpa|ogg|wav|wma|wpl)$/i),
+        "compressed": (/\.(7z|arj|deb|pkg|rar|rpm|gz|zip|z)$/i),
+        "disc": (/\.(bin|dmg|iso|toast|vcd)$/i),
+        "database": (/\.(csv|dat|db|dbf|log|mdb|sav|sql|tar)$/i),
+        "programming": (/\.(bat|sh|py|js|ts|c|cgi|class|cpp|cs|h|java|php|swift|vb|rb)$/i),
+        "executable": (/\.(apk|bat|bin|cgi|com|exe|gadget|jar|msi|wsf)$/i),
+        "presentation": (/\.(odp|pps|ppt|pptx)$/i),
+        "spreadsheet": (/\.(ods|xls|xlsm|xlsx)$/i),
+        "word-processor-pdf": (/\.(doc|odt|pdf|rtf|tex|wpd)$/i)
     }
     let result = false;
     for (let type of types) {
