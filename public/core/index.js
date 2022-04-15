@@ -1,10 +1,10 @@
 console.log("Cargo el core");
 
 const path = require('path');
-const { ipcMain } = require('electron')
+const { ipcMain, Menu, BrowserWindow } = require('electron')
 const { searchDir } = require('./helpers')
 const { Worker } = require('worker_threads');
-
+const { shell } = require('electron')
 
 let worker;
 
@@ -69,4 +69,42 @@ ipcMain.on('stop-current-search', async (event, _) => {
         worker.removeAllListeners();
         await worker?.terminate();
     }
+})
+
+ipcMain.on('show-context-menu', (event, file) => {
+    const template = [
+        {
+            id: 'open',
+            label: 'Open',
+            type: 'normal',
+            click: () => { shell.openPath(file.path) }
+        },
+        {
+            id: 'open-select',
+            label: 'Open Path',
+            type: 'normal',
+            click: () => { shell.showItemInFolder(file.path) }
+        },
+        {
+            id: 'copy-name',
+            label: 'Copy Name to Clipboard',
+            type: 'normal',
+            click: () => { shell.showItemInFolder(file.path) }
+        },
+        {
+            id: 'copy-path',
+            label: 'Copy Path to Clipboard',
+            type: 'normal',
+            click: () => { shell.showItemInFolder(file.path) }
+        },
+        { type: 'separator' },
+        { label: 'Menu Item 2', type: 'checkbox', checked: true }
+    ]
+    const menu = Menu.buildFromTemplate(template);
+    const browserWindow = BrowserWindow.fromWebContents(event.sender);
+    menu.popup(browserWindow);
+})
+
+ipcMain.on('open-file', (event, file) => {
+    shell.openPath(file.path);
 })

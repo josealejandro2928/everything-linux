@@ -28,4 +28,10 @@
         padding: 2px 4px !important;
         border-bottom: 1px solid #303032 !important;
     }
+
+    tr.active {
+        // background-color: #b3e5fc !important;
+        filter: brightness(1.25);
+        transform: scale(.99);
+    }
 }

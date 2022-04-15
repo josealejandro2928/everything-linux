@@ -7,6 +7,8 @@ import './DataTable.scss'
 import { setOrder } from '../../../store/actions/search.actions';
 import usePersistData from '../../../hooks/usePersistData';
 import { useInView } from "react-intersection-observer";
+import { IFile } from '../../../models/file.model';
+const { ipcRenderer } = window.require('electron');
 
 
 const DataTable = memo(() => {
@@ -71,7 +73,16 @@ const DataTable = memo(() => {
     );
 
     const rows = elements.map((element) => (
-        <VirtualScrollChild height={28} total={totalItems}>
+        <VirtualScrollChild height={28} total={totalItems}
+            id={element.id}
+            onContextMenu={(e: any) => {
+                e.preventDefault();
+                onOpenContextMenu(element)
+            }}
+            onDoubleClick={(e: any) => {
+                onOpenFile(element);
+            }}
+        >
             <RowTable
                 key={element.id}
                 name={element.name}
@@ -85,6 +96,16 @@ const DataTable = memo(() => {
             />
         </VirtualScrollChild>
     ));
+
+    const onOpenContextMenu = (el: IFile) => {
+        ipcRenderer.send('show-context-menu', el)
+    }
+
+    const onOpenFile = (el: IFile) => {
+        ipcRenderer.send('open-file', el)
+    }
+
+
 
     return (
         <div className='DataTable'>
@@ -103,11 +124,11 @@ const DataTable = memo(() => {
 });
 
 
-const RowTable = memo(({ name, sizeLabel, mimetype, lastDateModified, path, icon, textSize, searchFile }: any) => {
+const RowTable = memo(({ name, sizeLabel, mimetype, lastDateModified, path, icon, textSize, searchFile, }: any) => {
     const showHighLight = useSelector((state: State) => state.settings.showHighLight)
     return (
         <>
-            <td>
+            <td >
                 <Tooltip label={name}>
                     <Text size={textSize} lineClamp={2}>
                         <div style={{ 'display': 'flex', gap: '8px', justifyContent: 'flex-start', 'alignItems': 'center' }}>
@@ -121,28 +142,28 @@ const RowTable = memo(({ name, sizeLabel, mimetype, lastDateModified, path, icon
                     </Text>
                 </Tooltip>
             </td>
-            <td>
+            <td >
 
                 <Text size={textSize} lineClamp={1}>
                     {sizeLabel}
                 </Text>
 
             </td>
-            <td>
+            <td >
                 <Tooltip label={mimetype}>
                     <Text size={textSize} lineClamp={1}>
                         {mimetype}
                     </Text>
                 </Tooltip>
             </td>
-            <td>
+            <td >
 
                 <Text size={textSize} lineClamp={1}>
                     {lastDateModified as Date}
                 </Text>
 
             </td>
-            <td>
+            <td >
                 <Tooltip label={path}>
                     <Text size={textSize} lineClamp={1}>
                         {path}
@@ -158,15 +179,24 @@ const RowTable = memo(({ name, sizeLabel, mimetype, lastDateModified, path, icon
  * VirtualScroll. Computes inline style and
  * handles whether to display props.children.
  */
-const VirtualScrollChild = memo(({ height, children, total = 50 }: { height: any, children: any, total: number }) => {
+const VirtualScrollChild = memo(({ height, children, total = 50, onDoubleClick = () => { }, onContextMenu = () => { }, id }:
+    { height: any, children: any, total: number, onDoubleClick: Function, onContextMenu: Function, id: string }) => {
     const [ref, inView] = useInView();
     // console.log("🚀 ~ file: DataTable.tsx ~ line 152 ~ VirtualScrollChild ~ inView", inView)
     const style = {
         height: `${height}px`,
-        overflow: 'hidden'
+        overflow: 'hidden',
+        cursor: 'pointer'
     };
     return (
-        <tr style={style} ref={ref}>
+        <tr id={id}
+            onDoubleClick={onDoubleClick as any}
+            onContextMenu={onContextMenu as any}
+            onClick={() => {
+                const el = document.getElementById(id);
+                el?.classList.toggle('active');
+            }}
+            style={style} ref={ref}>
             {(inView || total < 80) ? children : null}
         </tr>
     );
