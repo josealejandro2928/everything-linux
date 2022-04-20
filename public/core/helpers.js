@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 const icons = require('./icon-data.json');
+const mime = require('mime-types');
 
 function searchDir() {
     try {
@@ -57,6 +58,11 @@ function bindIcons() {
     }
 }
 
+/**
+ * Gets the icon of the material corresponding to the file information.
+ * @param {*} meta Custom object of a file
+ * @returns 
+ */
 function getIcon(meta) {
     const cache = {
         "ts": "typescript",
@@ -137,24 +143,165 @@ function getIcon(meta) {
 
 }
 
+
 async function copy(path) {
     const util = require('util');
     const exec = util.promisify(require('child_process').exec);
     await exec(`xclip-copyfile ${path}`);
 }
 
+
+/**
+ * 
+ * @param {*} cmd Linux command to execute.
+ * @param {*} path Global path of the file.
+ */
 async function openExternalApp(cmd, path) {
     const util = require('util');
     const exec = util.promisify(require('child_process').exec);
     await exec(`${cmd} ${path}`);
 }
 
+/**
+ * 
+ * @param {*} types Array of file types extension to be filtered. example: [ 'image', 'video' ]
+ * @param {*} name Name of the file to be processed. example: my_presentation.pptx 
+ * @returns 
+ */
+function filterTypes(types, name = '') {
+    let cacheRegex = {
+        "image": (/\.(apng|gif|jpe?g|tiff?|png|webp|bmp|avif|svg|ico|cur)$/i),
+        "video": (/\.(mov|avi|mpeg|mkv|mp4|wmv|avchd|flv|f4v|swf|webm|mpeg-2)$/i),
+        "audio": (/\.(aif|cda|mid|mp3|mpa|ogg|wav|wma|wpl)$/i),
+        "compressed": (/\.(7z|arj|deb|pkg|rar|rpm|gz|zip|z)$/i),
+        "disc": (/\.(bin|dmg|iso|toast|vcd)$/i),
+        "database": (/\.(csv|dat|db|dbf|log|mdb|sav|sql|tar)$/i),
+        "programming": (/\.(bat|sh|py|js|ts|c|cgi|class|cpp|cs|h|java|php|swift|vb|rb)$/i),
+        "executable": (/\.(apk|bat|bin|cgi|com|exe|gadget|jar|msi|wsf)$/i),
+        "presentation": (/\.(odp|pps|ppt|pptx)$/i),
+        "spreadsheet": (/\.(ods|xls|xlsm|xlsx)$/i),
+        "word-processor-pdf": (/\.(doc|odt|pdf|rtf|tex|wpd)$/i)
+    }
+    let result = false;
+    for (let type of types) {
+        let re = cacheRegex[type]
+        if (!re) continue;
+        result = re.test(name);
+    }
+    return result;
+}
+
+
+/**
+ * 
+ * @param {*} element Element for the file system to be processed.
+ * @param {*} fullPath Full path.
+ * @param {*} isDirectory Boolean indicating if the current element is a file or a directory.
+ * @param {*} fileStats Object data from fs.stats form a file.
+ * @returns 
+ */
+function getMedataFile(element, fullPath, isDirectory, fileStats) {
+    const meta = { name: element.name, path: fullPath, isDirectory };
+    try {
+        if (!isDirectory) {
+            meta.size = fileStats.size;
+            meta.mimetype = mime.lookup(fullPath);
+
+            let sizeKb = meta.size / 1000;
+            meta.sizeLabel = meta.size.toFixed(1) + ' bytes';
+
+            if (sizeKb >= 1 && sizeKb <= 1000) {
+                meta.sizeLabel = sizeKb.toFixed(1) + ' Kb';
+            }
+            if (sizeKb > 1000 && sizeKb < 1e+6) {
+                sizeKb = sizeKb / 1000;
+                meta.sizeLabel = sizeKb.toFixed(1) + ' Mb';
+            }
+            if (sizeKb > 1e+6) {
+                sizeKb = sizeKb / 1000 / 1000;
+                meta.sizeLabel = sizeKb.toFixed(1) + ' Gb';
+            }
+        } else {
+            let result = fs.readdirSync(fullPath)
+            meta.size = result.length;
+            meta.sizeLabel = `${result.length} items`;
+            meta.mimetype = 'folder'
+        }
+
+        meta.id = `${meta.name}_${meta.path}_${meta.mimetype}_${meta.size}_${fileStats.ino}`;
+        meta.lastDateModified = getDateModified(fileStats.mtime);
+        meta.mtime = fileStats.mtime;
+        let icon = getIcon(meta);
+        meta.icon = icon?.path || '';
+        return meta;
+    } catch (e) {
+        return null;
+    }
+    //////////////HELPERS///////////////////////
+    function getDateModified(date) {
+        date = new Date(date);
+        let dd = parseTwoDigits(date.getDate());
+        let mm = parseTwoDigits(date.getMonth() + 1);
+        let yyyy = parseTwoDigits(date.getFullYear());
+        let hh = parseTwoDigits(date.getHours());
+        let mmm = parseTwoDigits(date.getMinutes());
+        function parseTwoDigits(x) {
+            return x < 10 ? `0${x}` : x;
+        }
+        return `${dd}/${mm}/${yyyy} ${hh}:${mmm}`;
+    }
+    ////////////////////////////////////////////
+}
+
+
+/**
+ * 
+ * @param {*} searchParam String from the user to search. 
+ * @param {*} element Element for the file system to be processed.
+ * @param {*} parentDir Parent directory. example: /home/user/
+ * @param {*} isDirectory Boolean indicating if the current element is a file or a directory.
+ * @param {*} fileStats Object data from fs.stats form a file.
+ * @param {*} options Option object. exampe: options: {
+     hiddenFiles: true,
+     levels: 8,
+     selectedFileTypes: [ 'image', 'video' ],
+     avoidFiles: [ 'node_modules', 'env', '$Recycle.Bin', '.pyc', 'Windows' ],
+     reportFound: true
+}
+ * @returns 
+ */
+function filterElement(searchParam, element, parentDir, isDirectory, fileStats, options) {
+
+    const elementName = element.name.toLowerCase().trim();
+    let searchItem = searchParam.toLowerCase().trim();
+    let indexSearch = null;
+
+    if (options.isRegex) {
+        let re = new RegExp(searchItem);
+        indexSearch = elementName.search(re);
+    } else {
+        indexSearch = elementName.includes(searchItem);
+    }
+
+    if (indexSearch > -1 && indexSearch) {
+        if (options?.selectedFileTypes?.length) {
+            let found = filterTypes(options?.selectedFileTypes, elementName)
+            return found ? getMedataFile(element, path.join(parentDir, element.name), isDirectory, fileStats) : null;
+        }
+        else
+            return getMedataFile(element, path.join(parentDir, element.name), isDirectory, fileStats)
+    }
+    return null
+}
+
+
 
 module.exports = {
     searchDir,
     getIcon,
     copy,
-    openExternalApp
-
+    openExternalApp,
+    filterElement,
 }
+
 // bindIcons();
