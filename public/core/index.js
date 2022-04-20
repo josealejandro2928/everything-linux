@@ -2,9 +2,9 @@ console.log("Cargo el core");
 
 const path = require('path');
 const { ipcMain, Menu, BrowserWindow } = require('electron')
-const { searchDir } = require('./helpers')
+const { searchDir, openExternalApp } = require('./helpers')
 const { Worker } = require('worker_threads');
-const { shell } = require('electron')
+const { shell, clipboard } = require('electron')
 
 let worker;
 
@@ -23,7 +23,7 @@ ipcMain.on('search', async (event, arg) => {
             execArgv: [...process.execArgv, '--unhandled-rejections=strict'],
             workerData: {
                 directories,
-                searchParam,
+                searchParam: searchParam || '',
                 options,
             }
         });
@@ -89,22 +89,65 @@ ipcMain.on('show-context-menu', (event, file) => {
             id: 'copy-name',
             label: 'Copy Name to Clipboard',
             type: 'normal',
-            click: () => { shell.showItemInFolder(file.path) }
+            click: () => {
+                clipboard.writeText(file.name);
+                event.sender.send('clipboard', "name");
+            }
         },
         {
             id: 'copy-path',
             label: 'Copy Path to Clipboard',
             type: 'normal',
-            click: () => { shell.showItemInFolder(file.path) }
+            click: () => {
+                clipboard.writeText(file.path);
+                event.sender.send('clipboard', "path");
+            }
         },
         { type: 'separator' },
-        { label: 'Menu Item 2', type: 'checkbox', checked: true }
+        {
+            id: 'open-vscode',
+            label: 'Open with vscode',
+            type: 'normal',
+            click: async () => {
+                try {
+                    await openExternalApp('code -n', file.path)
+                    event.sender.send("refresh");
+                } catch (e) {
+                    event.sender.send('error', e.message || 'Error')
+                }
+            }
+        },
+        {
+            id: 'compress',
+            label: 'Compres file',
+            type: 'normal',
+            click: async () => {
+                try {
+                    let name = `"${file.path}"`
+                    await openExternalApp(`zip -r -j ${name}.zip`, `"${file.path}"`);
+                    event.sender.send("refresh");
+                } catch (e) {
+                    console.log("*********ERROR***********", e);
+                    event.sender.send('error', e.message || 'Error')
+                }
+            }
+        },
+        // { type: 'separator' },
+        // {
+        //     id: 'delete-item',
+        //     label: 'Delete file',
+        //     type: 'normal',
+        //     click: () => {
+        //         shell.trashItem(file.path);
+        //         event.sender.send("refresh");
+        //     }
+        // },
     ]
     const menu = Menu.buildFromTemplate(template);
     const browserWindow = BrowserWindow.fromWebContents(event.sender);
     menu.popup(browserWindow);
 })
 
-ipcMain.on('open-file', (event, file) => {
+ipcMain.on('open-file', (_, file) => {
     shell.openPath(file.path);
 })

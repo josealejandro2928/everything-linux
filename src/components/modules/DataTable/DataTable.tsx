@@ -72,9 +72,9 @@ const DataTable = memo(() => {
         </tr>
     );
 
-    const rows = elements.map((element) => (
+    const rows = elements.map((element, index) => (
         <VirtualScrollChild height={28} total={totalItems}
-            id={element.id}
+            id={element.id + index}
             onContextMenu={(e: any) => {
                 e.preventDefault();
                 onOpenContextMenu(element)
@@ -84,7 +84,6 @@ const DataTable = memo(() => {
             }}
         >
             <RowTable
-                key={element.id}
                 name={element.name}
                 icon={element.icon}
                 path={element.path}
@@ -186,7 +185,8 @@ const VirtualScrollChild = memo(({ height, children, total = 50, onDoubleClick =
     const style = {
         height: `${height}px`,
         overflow: 'hidden',
-        cursor: 'pointer'
+        cursor: 'pointer',
+        // display: inView ? 'contents' : 'none'
     };
     return (
         <tr id={id}

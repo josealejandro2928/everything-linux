@@ -1,8 +1,8 @@
-import React, { useEffect, useRef, useTransition } from 'react';
+import React, { useEffect, useRef, useState, useTransition } from 'react';
 import './App.scss';
 import Layout from '../components/layout/layout/Layout';
-import { ColorScheme, ColorSchemeProvider, Global, MantineProvider } from '@mantine/core';
-import { useLocalStorage, useDebouncedValue } from '@mantine/hooks';
+import { ColorScheme, ColorSchemeProvider, Notification, MantineProvider } from '@mantine/core';
+import { useLocalStorage } from '@mantine/hooks';
 import DataTable from '../components/modules/DataTable/DataTable';
 import Footer from '../components/layout/Footer/Footer';
 import { useDispatch, useSelector } from 'react-redux';
@@ -15,6 +15,7 @@ const { ipcRenderer } = window.require('electron');
 
 
 let cache: any = {};
+let isBussy = false;
 
 function App() {
   const [colorScheme, setColorScheme] = useLocalStorage<ColorScheme>({
@@ -35,6 +36,7 @@ function App() {
   const [_, startTransition] = useTransition();
   const newFilesComming = useRef<Array<IFile>>([]);
   const isCollecting = useRef<boolean>(false);
+  const [toast, setToasState] = useState({ title: '', body: '', show: false, color: 'green' });
 
 
 
@@ -45,7 +47,7 @@ function App() {
       return;
     }
     console.log("Ejecute esto")
-    onSearch();
+    onSearch(directory, searchFile, options);
   }, [directory, searchFile, options])
 
   useEffect(() => {
@@ -62,7 +64,7 @@ function App() {
         newFilesComming.current = [];
         cache = {};
         isCollecting.current = false;
-      }, 500)
+      }, 250)
     });
   }, [])
 
@@ -70,9 +72,26 @@ function App() {
     ipcRenderer.on('finish', () => {
       dispatch(setIsSearching(false));
     });
+
+    ipcRenderer.on('clipboard', (_: any, param: string) => {
+      setToasState({ ...toast, show: true, title: `Ok`, body: `${param} copied to clipboard` })
+    })
+
+    ipcRenderer.on('refresh', async (_: any, param: string) => {
+      if (isBussy) return;
+      console.log("Entre aqui en el refresh")
+      isBussy = true;
+      onSearch(directory, searchFile, options);
+      await _delayMs(150);
+      isBussy = false;
+    })
+
+    ipcRenderer.on('error', async (_: any, param: string) => {
+      setToasState({ ...toast, show: true, title: `Error`, body: `${param}`, color: 'red' })
+    })
   }, [])
 
-  async function onSearch() {
+  async function onSearch(dir: any, searchPar: any, opt: any) {
     ipcRenderer.send('stop-current-search');
     dispatch(setIsSearching(true));
     dispatch(setResults([]));
@@ -80,9 +99,9 @@ function App() {
 
     await _delayMs(150);
     const requestToSearch: IRequestSearch = {
-      directories: directory,
-      searchParam: searchFile as string,
-      options: options
+      directories: dir,
+      searchParam: searchPar,
+      options: opt
     }
     ipcRenderer.send('search', requestToSearch);
   }
@@ -102,8 +121,6 @@ function App() {
 
 
   return (
-
-
     <ColorSchemeProvider colorScheme={colorScheme} toggleColorScheme={toggleColorScheme}>
 
       <MantineProvider theme={{
@@ -129,11 +146,48 @@ function App() {
           </Layout>
         </div>
         <LoadingSearch opened={isSearching} setOpened={onStopCurrentSearch} />
+        <ToastNotification
+          show={toast.show}
+          title={toast.title}
+          body={toast.body}
+          color={toast.color}
+          onClose={() => { setToasState({ ...toast, show: false }) }}
+        />
+
       </MantineProvider>
     </ColorSchemeProvider >
-
-
   );
 }
 
 export default App;
+
+
+
+const ToastNotification = ({ show, title, body, onClose, color }:
+  { show: boolean, title: string, body?: any, onClose: Function, color: string }) => {
+  const [showToast, setShowToast] = useState(false);
+  const time = useRef<any>(null);
+
+  useEffect(() => {
+    setShowToast(show);
+    clearTimeout(time.current);
+    if (show) {
+      time.current = setTimeout(() => {
+        closeToast();
+      }, 5000);
+    }
+  }, [show])
+
+  function closeToast() {
+    setShowToast(false);
+    onClose();
+  }
+
+  return (
+    <>
+      {showToast && <Notification onClose={closeToast} color={color} className='ToastNotification' title={title}>
+        {body}
+      </Notification>}
+    </>
+  )
+}

@@ -105,8 +105,8 @@ function getIcon(meta) {
         "php": "php",
         "class": "java",
         "srt": "text",
-        "swf":"video",
-        "dat":"hex"
+        "swf": "video",
+        "dat": "hex"
 
     }
 
@@ -137,9 +137,24 @@ function getIcon(meta) {
 
 }
 
+async function copy(path) {
+    const util = require('util');
+    const exec = util.promisify(require('child_process').exec);
+    await exec(`xclip-copyfile ${path}`);
+}
+
+async function openExternalApp(cmd, path) {
+    const util = require('util');
+    const exec = util.promisify(require('child_process').exec);
+    await exec(`${cmd} ${path}`);
+}
+
+
 module.exports = {
     searchDir,
-    getIcon
+    getIcon,
+    copy,
+    openExternalApp
 
 }
 // bindIcons();
