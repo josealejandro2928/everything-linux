@@ -14,7 +14,6 @@ import usePersistData from '../hooks/usePersistData';
 const { ipcRenderer } = window.require('electron');
 
 
-let cache: any = {};
 let isBussy = false;
 
 function App() {
@@ -36,6 +35,7 @@ function App() {
   const [_, startTransition] = useTransition();
   const newFilesComming = useRef<Array<IFile>>([]);
   const isCollecting = useRef<boolean>(false);
+  const cache = useRef<any>({});
   const [toast, setToasState] = useState({ title: '', body: '', show: false, color: 'green' });
 
 
@@ -52,24 +52,26 @@ function App() {
 
   useEffect(() => {
     ipcRenderer.on('found-result', (_: any, data: { data: IFile }) => {
-      if (cache[data.data.id]) return;
-      cache[data.data.id] = true;
+      if (cache.current[data.data.id]) return;
+      cache.current[data.data.id] = true;
       newFilesComming.current.push(data.data);
       if (isCollecting.current) return;
       isCollecting.current = true;
+      dispatch(setIsSearching(true));
       setTimeout(() => {
         startTransition(() => {
           dispatch(setNewResult([...newFilesComming.current] as any));
         })
         newFilesComming.current = [];
-        cache = {};
+        cache.current = {};
         isCollecting.current = false;
-      }, 250)
+      }, 150)
     });
   }, [])
 
   useEffect(() => {
     ipcRenderer.on('finish', () => {
+      // console.log("Entre en el finish")
       dispatch(setIsSearching(false));
     });
 
@@ -79,7 +81,7 @@ function App() {
 
     ipcRenderer.on('refresh', async (_: any, param: string) => {
       if (isBussy) return;
-      console.log("Entre aqui en el refresh")
+      // console.log("Entre aqui en el refresh")
       isBussy = true;
       onSearch(directory, searchFile, options);
       await _delayMs(150);
@@ -97,7 +99,7 @@ function App() {
     dispatch(setResults([]));
     newFilesComming.current = [];
 
-    await _delayMs(150);
+    await _delayMs(100);
     const requestToSearch: IRequestSearch = {
       directories: dir,
       searchParam: searchPar,
@@ -145,7 +147,7 @@ function App() {
             <Footer></Footer>
           </Layout>
         </div>
-        <LoadingSearch opened={isSearching} setOpened={onStopCurrentSearch} />
+        <LoadingSearch key={isSearching as any} opened={isSearching} setOpened={onStopCurrentSearch} />
         <ToastNotification
           show={toast.show}
           title={toast.title}

@@ -15,6 +15,7 @@ ipcMain.on('search', async (event, arg) => {
 
     try {
         if (worker) {
+            worker.postMessage({ message: "kill" });
             worker.removeAllListeners();
             await worker?.terminate();
         }
@@ -66,8 +67,9 @@ ipcMain.on('root-dir', (event, _) => {
 ipcMain.on('stop-current-search', async (event, _) => {
     console.log("Entre en el Stop");
     if (worker) {
-        worker.removeAllListeners();
-        await worker?.terminate();
+        worker.postMessage({ message: "kill" });
+        // worker.removeAllListeners();
+        // await worker?.terminate();
     }
 })
 
