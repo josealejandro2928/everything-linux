@@ -189,7 +189,7 @@ function singleCoreSearch(directories, searchParam, options, result, onlyRoot) {
                 }
             }
 
-            if (!onlyRoot && (options.levels == 0 || level <= options.levels)) {
+            if (!onlyRoot && (options.levels == 0 || level < options.levels)) {
                 try {
                     if (isDirectory) {
                         queue.push({ link: path.join(dir.link, element.name), level: dir.level + 1 })

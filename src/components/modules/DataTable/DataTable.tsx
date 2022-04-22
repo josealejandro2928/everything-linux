@@ -73,7 +73,9 @@ const DataTable = memo(() => {
     );
 
     const rows = elements.map((element, index) => (
-        <VirtualScrollChild height={28} total={totalItems}
+        <VirtualScrollChild
+            key={element.id}
+            height={28} total={totalItems}
             id={element.id + index}
             onContextMenu={(e: any) => {
                 e.preventDefault();
@@ -127,7 +129,7 @@ const RowTable = memo(({ name, sizeLabel, mimetype, lastDateModified, path, icon
     const showHighLight = useSelector((state: State) => state.settings.showHighLight)
     return (
         <>
-            <td >
+            <td height="20" >
                 <Tooltip label={name}>
                     <Text size={textSize} lineClamp={2}>
                         <div style={{ 'display': 'flex', gap: '8px', justifyContent: 'flex-start', 'alignItems': 'center' }}>
@@ -141,28 +143,28 @@ const RowTable = memo(({ name, sizeLabel, mimetype, lastDateModified, path, icon
                     </Text>
                 </Tooltip>
             </td>
-            <td >
+            <td height="20">
 
                 <Text size={textSize} lineClamp={1}>
                     {sizeLabel}
                 </Text>
 
             </td>
-            <td >
+            <td height="20">
                 <Tooltip label={mimetype}>
                     <Text size={textSize} lineClamp={1}>
                         {mimetype}
                     </Text>
                 </Tooltip>
             </td>
-            <td >
+            <td height="20">
 
                 <Text size={textSize} lineClamp={1}>
                     {lastDateModified as Date}
                 </Text>
 
             </td>
-            <td >
+            <td height="20">
                 <Tooltip label={path}>
                     <Text size={textSize} lineClamp={1}>
                         {path}

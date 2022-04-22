@@ -27,10 +27,7 @@ function search(
 
     directories = directories instanceof Array ? directories : [directories];
     directories = directories.map((el) => ({ link: el, level: 0 }));
-    // console.log("🚀 ~ file: search-child.js ~ line 30 ~ directories", directories)
-
     let level = 0;
-
     try {
         let result = [];
         let queue = [...directories];
@@ -42,18 +39,18 @@ function search(
             let element = { name: path.basename(dir.link) };
 
             let re = /^(?!\.).*$/;
+            if (!options.hiddenFiles && !re.test(element.name))
+                continue;
+
+            if (options?.avoidFiles?.length && options.avoidFiles.includes(element.name))
+                continue;
+
             try {
                 fileStats = fs.statSync(dir.link);
                 isDirectory = fileStats.isDirectory();
             } catch (e) {
                 continue;
             }
-
-            if (!options.hiddenFiles && !re.test(fileStats.name))
-                continue;
-
-            if (options?.avoidFiles?.length && options.avoidFiles.includes(fileStats.name))
-                continue;
 
             const found = filterElement(searchParam, element, dir.link, isDirectory, fileStats, options);
 
