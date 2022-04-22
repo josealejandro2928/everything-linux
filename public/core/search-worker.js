@@ -16,6 +16,7 @@ options: {
      levels: 8,
      selectedFileTypes: [ 'image', 'video' ],
      avoidFiles: [ 'node_modules', 'env', '$Recycle.Bin', '.pyc', 'Windows' ],
+     multicores: true
      reportFound: true
 }
 */
@@ -27,6 +28,7 @@ async function search(
         levels: null,
         reportFound: true,
         avoidFiles: [],
+        multicores: false,
         selectedFileTypes: [],
     },) {
     console.log("//////////////////********ENTRE EN EL SEARCH WORKER********////////////////////////", { directories, searchParam, options }) // prints "pin
@@ -44,7 +46,7 @@ async function search(
         directories = getMoreDirectories(directories, onlyRoot, options.hiddenFiles, options.avoidFiles);
         let result = [];
 
-        if (!onlyRoot)
+        if (!onlyRoot && options.multicores)
             return await distributeInMultipleCores(directories, result);
         else
             return singleCoreSearch(directories, searchParam, options, result, onlyRoot);

@@ -5,7 +5,7 @@ import DataTypesSelector from './components/DataTypesSelector/DataTypesSelector'
 import { Select, Switch, Text, Tooltip } from '@mantine/core';
 import { useDispatch, useSelector } from 'react-redux';
 import { State } from '../../../store/reducers';
-import { setAvoidFiles, setSelectdFileTypes, setHiddenFiles, setLevels, setHighLight } from '../../../store/actions/settings.actions';
+import { setAvoidFiles, setSelectdFileTypes, setHiddenFiles, setLevels, setHighLight, setMulticores } from '../../../store/actions/settings.actions';
 import { QuestionMark } from 'tabler-icons-react';
 import usePersistData from '../../../hooks/usePersistData';
 import AvoidFilesSelector from './components/AvoidFilesSelector/AvoidFilesSelector';
@@ -17,6 +17,7 @@ const Filters = () => {
     const levels = usePersistData(useSelector((state: State) => state.settings.levels), { key: 'levels' });
     const avoidFiles = usePersistData(useSelector((state: State) => state.settings.avoidFiles), { key: 'avoidFiles' });
     const showHighLight = usePersistData(useSelector((state: State) => state.settings.showHighLight), { key: 'showHighLight' })
+    const multicores = usePersistData(useSelector((state: State) => state.settings.multicores), { key: 'multicores' })
     const dispatch = useDispatch();
 
     return <div className='Filters'>
@@ -67,6 +68,7 @@ const Filters = () => {
         <br />
 
         <div className='setting-item'>
+
             <Text size='sm' style={{ 'marginBottom': '.5rem' }}>
                 Set the deep of the search:
             </Text>
@@ -90,20 +92,19 @@ const Filters = () => {
                 ]}
             />
 
+            <Text size='sm' style={{ 'marginBottom': '.5rem', marginTop: '1rem' }}>
+                Enable multicores
+            </Text>
+            <Switch checked={multicores} onChange={(event) => (dispatch(setMulticores(event.currentTarget.checked)))} />
+
         </div>
         <br />
         <div className='setting-item'>
             <Text size='sm' style={{ 'marginBottom': '.5rem' }}>
                 Highlights the match in the results
             </Text>
-            {/* <div className='_icon'>
-                <Tooltip label={`Files starting with '.' will not be consider`}>
-                    <QuestionMark />
-                </Tooltip>
-            </div> */}
             <Switch checked={showHighLight} onChange={(event) => (dispatch(setHighLight(event.currentTarget.checked)))} />
         </div>
-
     </div>
 
 }

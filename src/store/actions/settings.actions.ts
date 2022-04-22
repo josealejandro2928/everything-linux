@@ -4,6 +4,7 @@ import {
   SET_HIDDEN_FILES,
   SET_LEVELS,
   SET_HIGH_LIGHT,
+  SET_MULTICORES,
 } from '../reducers/setting.reducer';
 
 export const setSelectdFileTypes = (data: Array<string>) => async (dispatch: Function) => {
@@ -37,6 +38,13 @@ export const setLevels = (levels: number | null) => async (dispatch: Function) =
 export const setHighLight = (state: boolean) => async (dispatch: Function) => {
   return dispatch({
     type: SET_HIGH_LIGHT,
+    payload: state,
+  });
+};
+
+export const setMulticores = (state: boolean) => async (dispatch: Function) => {
+  return dispatch({
+    type: SET_MULTICORES,
     payload: state,
   });
 };

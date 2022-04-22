@@ -11,6 +11,7 @@ export interface SearchState {
     levels: number | null | undefined;
     selectedFileTypes: Array<string>;
     avoidFiles: Array<string>;
+    multicores: boolean;
   };
   textSize: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   order:
@@ -43,6 +44,7 @@ const loadedOrder = localStorage.getItem('order');
 const loadedAvoidFiles = localStorage.getItem('avoidFiles') || '[]';
 const loadedHiddenFiles = localStorage.getItem('hiddenFiles');
 const loadedLevels = localStorage.getItem('levels');
+const multicores = localStorage.getItem('multicores');
 
 const initialState: SearchState = {
   directory: loadedDirectory ? JSON.parse(loadedDirectory) : '/',
@@ -54,6 +56,7 @@ const initialState: SearchState = {
     levels: loadedLevels ? JSON.parse(loadedLevels) : 0,
     selectedFileTypes: [],
     avoidFiles: JSON.parse(loadedAvoidFiles),
+    multicores: multicores ? JSON.parse(multicores) : false,
   },
   textSize: loadedTextSize ? JSON.parse(loadedTextSize) : 'xs',
   order: loadedOrder ? JSON.parse(loadedOrder) : '+name',

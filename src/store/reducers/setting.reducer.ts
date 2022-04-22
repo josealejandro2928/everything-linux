@@ -5,6 +5,7 @@ export interface SettingState {
   hiddenFiles: boolean;
   levels: number | null;
   showHighLight: boolean;
+  multicores: boolean;
 }
 /////////////////////////////////////////////////////////////////
 
@@ -14,12 +15,14 @@ export const SET_AVOID_FILES = 'SET_AVOID_FILES';
 export const SET_HIDDEN_FILES = 'SET_HIDDEN_FILES';
 export const SET_LEVELS = 'SET_LEVELS';
 export const SET_HIGH_LIGHT = 'SET_HIGH_LIGHT';
+export const SET_MULTICORES = 'SET_MULTICORES';
 
 ///////////////////////////////////////////////////////////
 const loadedAvoidFiles = localStorage.getItem('avoidFiles') || '["node_modules","env"]';
 const loadedHiddenFiles = localStorage.getItem('hiddenFiles');
 const loadedLevels = localStorage.getItem('levels');
 const showHighLight = localStorage.getItem('showHighLight');
+const multicores = localStorage.getItem('multicores');
 
 const initialState: SettingState = {
   selectedFileTypes: [],
@@ -27,6 +30,7 @@ const initialState: SettingState = {
   hiddenFiles: loadedHiddenFiles ? JSON.parse(loadedHiddenFiles) : false,
   levels: loadedLevels ? JSON.parse(loadedLevels) : 0,
   showHighLight: showHighLight ? JSON.parse(showHighLight) : true,
+  multicores: multicores ? JSON.parse(multicores) : false,
 };
 
 const settingsReducer = (
@@ -45,6 +49,8 @@ const settingsReducer = (
       return { ...state, levels: payload };
     case SET_HIGH_LIGHT:
       return { ...state, showHighLight: payload };
+    case SET_MULTICORES:
+      return { ...state, multicores: payload };
     default:
       return state;
   }
