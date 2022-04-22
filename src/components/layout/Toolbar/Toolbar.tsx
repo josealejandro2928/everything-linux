@@ -37,7 +37,6 @@ const Toolbar = () => {
                     padding: '4px 16px'
                 }} span={8}>
                     <SearchInput />
-                    {/* <div className='divider'></div> */}
                 </Grid.Col>
 
                 <Grid.Col style={{

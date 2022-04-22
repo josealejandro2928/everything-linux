@@ -31,12 +31,14 @@ function App() {
   const options = useSelector((state: State) => state.search.options);
   const isSearching = useSelector((state: State) => state.search.isSearching);
   const mount = useRef<number>(0);
+  const [toast, setToasState] = useState({ title: '', body: '', show: false, color: 'green' });
   const dispatch = useDispatch();
   const [_, startTransition] = useTransition();
   const newFilesComming = useRef<Array<IFile>>([]);
   const isCollecting = useRef<boolean>(false);
   const cache = useRef<any>({});
-  const [toast, setToasState] = useState({ title: '', body: '', show: false, color: 'green' });
+  const timeoutSearch = useRef<any>({});
+  const stopSearh = useRef<boolean>(false);
 
 
 
@@ -46,59 +48,70 @@ function App() {
       mount.current++;
       return;
     }
-    console.log("Ejecute esto")
-    onSearch(directory, searchFile, options);
+    // console.log("Ejecute esto")
+    search(directory, searchFile, options);
   }, [directory, searchFile, options])
 
   useEffect(() => {
-    ipcRenderer.on('found-result', (_: any, data: { data: IFile }) => {
-      if (cache.current[data.data.id]) return;
-      cache.current[data.data.id] = true;
-      newFilesComming.current.push(data.data);
-      if (isCollecting.current) return;
-      isCollecting.current = true;
-      dispatch(setIsSearching(true));
-      setTimeout(() => {
-        startTransition(() => {
-          dispatch(setNewResult([...newFilesComming.current] as any));
-        })
-        newFilesComming.current = [];
-        cache.current = {};
-        isCollecting.current = false;
-      }, 150)
-    });
+    ipcRenderer.on('found-result', onFoundResult);
+    ipcRenderer.on('finish', onFinish);
+    ipcRenderer.on('clipboard', onClipboard);
+    ipcRenderer.on('refresh', onRefresh);
+    ipcRenderer.on('error', onError);
+
+    return () => {
+      ipcRenderer.removeListener('found-result', onFoundResult);
+      ipcRenderer.removeListener('finish', onFinish);
+      ipcRenderer.removeListener('clipboard', onClipboard);
+      ipcRenderer.removeListener('refresh', onRefresh);
+      ipcRenderer.removeListener('error', onError);
+    }
   }, [])
 
-  useEffect(() => {
-    ipcRenderer.on('finish', () => {
-      // console.log("Entre en el finish")
-      dispatch(setIsSearching(false));
-    });
-
-    ipcRenderer.on('clipboard', (_: any, param: string) => {
-      setToasState({ ...toast, show: true, title: `Ok`, body: `${param} copied to clipboard` })
-    })
-
-    ipcRenderer.on('refresh', async (_: any, param: string) => {
-      if (isBussy) return;
-      // console.log("Entre aqui en el refresh")
-      isBussy = true;
-      onSearch(directory, searchFile, options);
-      await _delayMs(150);
-      isBussy = false;
-    })
-
-    ipcRenderer.on('error', async (_: any, param: string) => {
-      setToasState({ ...toast, show: true, title: `Error`, body: `${param}`, color: 'red' })
-    })
-  }, [])
-
-  async function onSearch(dir: any, searchPar: any, opt: any) {
-    ipcRenderer.send('stop-current-search');
+  function onFoundResult(_: any, data: { data: IFile }) {
+    // console.log("🚀 ~ file: App.tsx ~ line 72 ~ onFoundResult ~ data", data)
+    if (stopSearh.current) return;
+    if (cache.current[data.data.id]) return;
+    cache.current[data.data.id] = true;
+    newFilesComming.current.push(data.data);
+    if (isCollecting.current) return;
+    isCollecting.current = true;
     dispatch(setIsSearching(true));
-    dispatch(setResults([]));
-    newFilesComming.current = [];
+    clearTimeout(timeoutSearch.current);
 
+    timeoutSearch.current = setTimeout(() => {
+      startTransition(() => {
+        dispatch(setNewResult([...newFilesComming.current] as any));
+      })
+      newFilesComming.current = [];
+      cache.current = {};
+      isCollecting.current = false;
+    }, 150)
+  }
+
+  function onFinish() {
+    dispatch(setIsSearching(false));
+  }
+
+  function onClipboard(_: any, param: string) {
+    setToasState({ ...toast, show: true, title: `Ok`, body: `${param} copied to clipboard` })
+  }
+
+  async function onRefresh() {
+    if (isBussy) return;
+    isBussy = true;
+    search(directory, searchFile, options);
+    await _delayMs(150);
+    isBussy = false;
+  }
+
+  function onError(_: any, param: string) {
+    setToasState({ ...toast, show: true, title: `Error`, body: `${param}`, color: 'red' })
+  }
+
+  async function search(dir: any, searchPar: any, opt: any) {
+    stopCurrentSearch();
+    await dispatch(setResults([]));
     await _delayMs(100);
     const requestToSearch: IRequestSearch = {
       directories: dir,
@@ -106,10 +119,17 @@ function App() {
       options: opt
     }
     ipcRenderer.send('search', requestToSearch);
+    stopSearh.current = false;
+    dispatch(setIsSearching(true));
   }
 
-  function onStopCurrentSearch() {
+  function stopCurrentSearch() {
     ipcRenderer.send('stop-current-search');
+    stopSearh.current = true;
+    clearTimeout(timeoutSearch.current);
+    newFilesComming.current = [];
+    cache.current = {};
+    isCollecting.current = false;
     dispatch(setIsSearching(false));
   }
 
@@ -147,7 +167,7 @@ function App() {
             <Footer></Footer>
           </Layout>
         </div>
-        <LoadingSearch key={isSearching as any} opened={isSearching} setOpened={onStopCurrentSearch} />
+        <LoadingSearch key={isSearching as any} opened={isSearching} setOpened={stopCurrentSearch} />
         <ToastNotification
           show={toast.show}
           title={toast.title}

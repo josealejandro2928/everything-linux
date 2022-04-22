@@ -27,6 +27,7 @@ function search(
 
     directories = directories instanceof Array ? directories : [directories];
     directories = directories.map((el) => ({ link: el, level: 0 }));
+    // console.log("🚀 ~ file: search-child.js ~ line 30 ~ directories", directories)
 
     let level = 0;
 
@@ -34,61 +35,52 @@ function search(
         let result = [];
         let queue = [...directories];
         for (let dir of queue) {
+            let fileStats;
             let output;
+            let isDirectory = false;
             level = dir.level;
+            let element = { name: path.basename(dir.link) };
+
+            let re = /^(?!\.).*$/;
             try {
-                output = fs.readdirSync(dir.link, { withFileTypes: true });
+                fileStats = fs.statSync(dir.link);
+                isDirectory = fileStats.isDirectory();
             } catch (e) {
                 continue;
             }
-            let re = /^(?!\.).*$/;
-            for (let element of output) {
 
-                if (!options.hiddenFiles && !re.test(element.name))
-                    continue;
+            if (!options.hiddenFiles && !re.test(fileStats.name))
+                continue;
 
-                if (options?.avoidFiles?.length && options.avoidFiles.includes(element.name))
-                    continue;
+            if (options?.avoidFiles?.length && options.avoidFiles.includes(fileStats.name))
+                continue;
 
-                let isDirectory = false;
-                let fileStats;
+            const found = filterElement(searchParam, element, dir.link, isDirectory, fileStats, options);
+
+            if (found) {
+                result.push(found);
+                process.send(JSON.stringify({ message: 'found', data: found }), undefined, undefined, (e) => {
+                    if (e) {
+                        console.log('!!!!!!!got err!!!!!!!!!!', e);
+                        process.kill(process.pid);
+                        process.exit(1);
+                    }
+                });
+            }
+
+            if (isDirectory && (!onlyRoot && (options.levels == 0 || level <= options.levels))) {
                 try {
-                    fileStats = fs.lstatSync(path.join(dir.link, element.name));
-                    isDirectory = fileStats.isDirectory();
+                    output = fs.readdirSync(dir.link);
+                    output.forEach((el) => (queue.push({ link: path.join(dir.link, el), level: dir.level + 1 })))
                 } catch (e) {
                     continue
-                }
-                const found = filterElement(searchParam, element, dir.link, isDirectory, fileStats, options);
-                if (found) {
-                    result.push(found);
-                    if (process?.send) {
-                        process.send(JSON.stringify({ message: 'found', data: found }), undefined, undefined, (e) => {
-                            if (e) {
-                                console.log('!!!!!!!got err!!!!!!!!!!', e);
-                                process.kill(process.pid);
-                                process.exit(1);
-                            }
-
-                        });
-                    } else {
-                        process.exit(0);
-                    }
-                }
-
-                if (!onlyRoot && (options.levels == 0 || level <= options.levels)) {
-                    try {
-                        if (isDirectory) {
-                            queue.push({ link: path.join(dir.link, element.name), level: dir.level + 1 })
-                        }
-                    } catch (e) {
-                        continue
-                    }
                 }
             }
         }
         return result;
     } catch (e) {
-        console.log("******Error graveeeeee: ", e.message);
+        console.log("******Error graveeeeee: ", e);
+        process.exit(1);
     }
 
 }

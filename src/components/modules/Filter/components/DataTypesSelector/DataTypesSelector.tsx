@@ -15,7 +15,8 @@ const defaultFileTypes = [
     { value: 'executable', label: 'Executable files' },
     { value: 'presentation', label: 'Presentation files' },
     { value: 'spreadsheet', label: 'Spreadsheet files' },
-    { value: 'word-processor-pdf', label: 'Word Processor and Pdf files' },
+    { value: 'word-processor', label: 'Word Processor files' },
+    { value: 'pdf', label: 'Pdf files' },
 
 ]
 

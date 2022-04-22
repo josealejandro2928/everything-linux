@@ -18,8 +18,13 @@ const SearchInput = () => {
             dispatch(setSearchFile(debounced));
     }, [debounced])
 
+    function onClear() {
+        setValue('');
+        // dispatch(setResults([]));
+    }
+
     const clearSection = (
-        <Tooltip onClick={() => { setValue(''); dispatch(setResults([])) }} label="Clear" position="top" placement="end">
+        <Tooltip onClick={onClear} label="Clear" position="top" placement="end">
             <Eraser size={20} style={{ display: 'block', opacity: 0.6, cursor: 'pointer' }} />
         </Tooltip>
     );

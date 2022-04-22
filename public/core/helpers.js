@@ -180,7 +180,8 @@ function filterTypes(types, name = '') {
         "executable": (/\.(apk|bat|bin|cgi|com|exe|gadget|jar|msi|wsf)$/i),
         "presentation": (/\.(odp|pps|ppt|pptx)$/i),
         "spreadsheet": (/\.(ods|xls|xlsm|xlsx)$/i),
-        "word-processor-pdf": (/\.(doc|odt|pdf|rtf|tex|wpd)$/i)
+        "word-processor": (/\.(doc|docx|odt|rtf|tex|wpd)$/i),
+        "pdf": (/\.(pdf)$/i)
     }
     let result = false;
     for (let type of types) {
@@ -270,7 +271,7 @@ function getMedataFile(element, fullPath, isDirectory, fileStats) {
 }
  * @returns 
  */
-function filterElement(searchParam, element, parentDir, isDirectory, fileStats, options) {
+function filterElement(searchParam, element, pathDir, isDirectory, fileStats, options) {
 
     const elementName = element.name.toLowerCase().trim();
     let searchItem = searchParam.toLowerCase().trim();
@@ -286,10 +287,10 @@ function filterElement(searchParam, element, parentDir, isDirectory, fileStats, 
     if (indexSearch > -1 && indexSearch) {
         if (options?.selectedFileTypes?.length) {
             let found = filterTypes(options?.selectedFileTypes, elementName)
-            return found ? getMedataFile(element, path.join(parentDir, element.name), isDirectory, fileStats) : null;
+            return found ? getMedataFile(element, pathDir, isDirectory, fileStats) : null;
         }
         else
-            return getMedataFile(element, path.join(parentDir, element.name), isDirectory, fileStats)
+            return getMedataFile(element, pathDir, isDirectory, fileStats)
     }
     return null
 }

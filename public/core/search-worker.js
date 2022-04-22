@@ -178,7 +178,7 @@ function singleCoreSearch(directories, searchParam, options, result, onlyRoot) {
             } catch (e) {
                 continue
             }
-            const found = filterElement(searchParam, element, dir.link, isDirectory, fileStats, options);
+            const found = filterElement(searchParam, element, path.join(dir.link, element.name), isDirectory, fileStats, options);
             if (found) {
                 // console.log("🚀 ~ file: search-worker.js ~ line 79 ~ found", found)
                 result.push(found);
