@@ -131,16 +131,18 @@ const RowTable = memo(({ name, sizeLabel, mimetype, lastDateModified, path, icon
         <>
             <td height="20" >
                 <Tooltip label={name}>
-                    <Text size={textSize} lineClamp={2}>
-                        <div style={{ 'display': 'flex', gap: '8px', justifyContent: 'flex-start', 'alignItems': 'center' }}>
-                            <img height={30} src={icon} />
+
+                    <div style={{ 'display': 'flex', gap: '8px', justifyContent: 'flex-start', 'alignItems': 'center' }}>
+                        <img height={30} src={icon} />
+                        <Text size={textSize} lineClamp={2}>
                             <HighLight show={showHighLight} searchText={searchFile}>
                                 {name}
                             </HighLight>
+                        </Text>
 
-                        </div>
+                    </div>
 
-                    </Text>
+
                 </Tooltip>
             </td>
             <td height="20">

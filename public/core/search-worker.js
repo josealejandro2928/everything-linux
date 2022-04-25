@@ -43,8 +43,9 @@ async function search(
             onlyRoot = true;
         }
         directories = directories instanceof Array ? directories : [directories];
-        directories = getMoreDirectories(directories, onlyRoot, options.hiddenFiles, options.avoidFiles);
-        let result = [];
+        directories = getMoreDirectories(directories, (!onlyRoot && options.multicores), options.hiddenFiles, options.avoidFiles);
+        // console.log("🚀 ~ file: search-worker.js ~ line 47 ~ directories", directories)
+        let result = {}
 
         if (!onlyRoot && options.multicores)
             return await distributeInMultipleCores(directories, result);
@@ -56,8 +57,8 @@ async function search(
 
 }
 
-function getMoreDirectories(directories = [], onlyRoot, hiddenFiles = false, avoidFiles = []) {
-    if (onlyRoot) return directories;
+function getMoreDirectories(directories = [], goDeep, hiddenFiles = false, avoidFiles = []) {
+    if (!goDeep) return directories;
     for (let dir of directories) {
         if (directories.length >= numCPUs) break;
         let output = null;
@@ -77,13 +78,25 @@ function getMoreDirectories(directories = [], onlyRoot, hiddenFiles = false, avo
         }
     }
     directories.shift();
-    return [...directories];
+    ///// CLEAN DIRECTORIES /////////
+    // let output = [];
+    // for (let dir of directories) {
+    //     let contained = directories.filter((e) => (e !== dir && e.includes(dir)));
+    //     if (!contained.length)
+    //         output.push(dir);
+    // }
+    // return output;
+    return [...directories]
 }
 
 function distributeInMultipleCores(directories, result) {
     // eslint-disable-next-line no-unused-vars
     return new Promise((resolve, _) => {
         let distrib = []
+        if (!directories.length) {
+            process.exit(1);
+        }
+
         while (directories.length) {
             for (let i = 0; i < numCPUs && directories.length > 0; i++) {
                 if (!distrib[i]) distrib[i] = []
@@ -109,7 +122,8 @@ function distributeInMultipleCores(directories, result) {
                 data = JSON.parse(data);
                 if (data?.message == "found") {
                     // console.log("🚀 ~ file: search-worker.js ~ line 72 ~ child.on ~ data", data.data);
-                    result.push(data.data);
+                    if (result[data?.data?.id]) return;
+                    result[data?.data?.id] = true;
                     if (options.reportFound) {
                         parentPort.postMessage(data.data);
                     }
@@ -124,7 +138,6 @@ function distributeInMultipleCores(directories, result) {
                 }
             });
             child.send("start");
-
         }
 
         parentPort.on("message", (data) => {
@@ -183,7 +196,8 @@ function singleCoreSearch(directories, searchParam, options, result, onlyRoot) {
             const found = filterElement(searchParam, element, path.join(dir.link, element.name), isDirectory, fileStats, options);
             if (found) {
                 // console.log("🚀 ~ file: search-worker.js ~ line 79 ~ found", found)
-                result.push(found);
+                if (result[found?.id]) continue;
+                result[found?.id] = true;
                 if (options.reportFound) {
                     parentPort.postMessage(found);
                 }

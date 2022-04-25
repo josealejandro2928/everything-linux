@@ -123,6 +123,10 @@ function _sort(
 
 function _processingDataFile(file: IFile | Array<IFile>, data: Array<IFile>, order: string) {
   let newChunks: Array<IFile> = file instanceof Array ? file : [file];
+  // newChunks = newChunks.filter((el) => {
+  //   if (data.findIndex((item) => item.id == el.id) == -1) return true;
+  //   return false;
+  // });
   let newArray = data.concat(newChunks);
   return _sort(order as any, newArray);
   // return newArray;

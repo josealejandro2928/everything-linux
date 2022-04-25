@@ -12,6 +12,7 @@ function searchDir() {
         let osname = os.hostname().split('-')[0];
         result = result.concat(getDir(path.join('/', 'home')));
         result = result.concat(getDir(path.join('/', 'media', osname)));
+        result = result.concat(getDir(path.join('/', 'mnt')));
         result = result.sort((a, b) => {
             if (a.name > b.name) return 1;
             if (a.name < b.name) return -1;
@@ -187,7 +188,7 @@ function filterTypes(types, name = '') {
     for (let type of types) {
         let re = cacheRegex[type]
         if (!re) continue;
-        result = re.test(name);
+        result = result || re.test(name);
     }
     return result;
 }
@@ -229,7 +230,8 @@ function getMedataFile(element, fullPath, isDirectory, fileStats) {
             meta.mimetype = 'folder'
         }
 
-        meta.id = `${meta.name}_${meta.path}_${meta.mimetype}_${meta.size}_${fileStats.ino}`;
+        // meta.id = `${meta.name}_${meta.path}_${meta.mimetype}_${meta.size}_${fileStats.ino}_${process.pid}`;
+        meta.id = `${meta.name}_${meta.path}_${meta.mimetype}_${meta.size}`;
         meta.lastDateModified = getDateModified(fileStats.mtime);
         meta.mtime = fileStats.mtime;
         let icon = getIcon(meta);

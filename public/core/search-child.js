@@ -13,6 +13,7 @@ function search(
         selectedFileTypes: [],
     },) {
     console.log(`/////********ENTRE EN EL SEARCH PID ${process.pid}********///////////`) // prints "pin
+    // console.log(`/////********DIRECTORIES OF ${process.pid}********///////////`, directories) // prints "pin
     let onlyRoot = false;
 
 
