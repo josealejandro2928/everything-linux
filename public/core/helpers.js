@@ -281,23 +281,27 @@ function filterElement(searchParam, element, pathDir, isDirectory, fileStats, op
     let elementName = element.name || ''
     let searchItem = searchParam || ''
     let indexSearch = null;
-
-    if (options.regularExpression) {
-        if (options.matchExaclyWord) {
-            searchItem = '^' + searchItem + '$';
-        }
-        let re = new RegExp(searchItem, 'i');
-        if (options.matchCase) re = new RegExp(searchItem);
-        indexSearch = re.test(elementName) ? 1 : -1;
-    } else {
-        elementName = options.matchCase ? elementName.trim() : elementName.toLowerCase().trim()
-        searchItem = options.matchCase ? searchItem.trim() : searchItem.toLowerCase().trim();
-        if (options.matchExaclyWord) {
-            indexSearch = searchItem == elementName ? 1 : -1;
+    try {
+        if (options.regularExpression) {
+            if (options.matchExaclyWord) {
+                searchItem = '^' + searchItem + '$';
+            }
+            let re = new RegExp(searchItem, 'i');
+            if (options.matchCase) re = new RegExp(searchItem);
+            indexSearch = re.test(elementName) ? 1 : -1;
         } else {
-            indexSearch = elementName.includes(searchItem);
+            elementName = options.matchCase ? elementName.trim() : elementName.toLowerCase().trim()
+            searchItem = options.matchCase ? searchItem.trim() : searchItem.toLowerCase().trim();
+            if (options.matchExaclyWord) {
+                indexSearch = searchItem == elementName ? 1 : -1;
+            } else {
+                indexSearch = elementName.includes(searchItem);
+            }
         }
+    } catch (e) {
+        console.log(e.message);
     }
+
     ///// Search also for data types ///////
     if (indexSearch > -1 && indexSearch) {
         if (options?.selectedFileTypes?.length) {

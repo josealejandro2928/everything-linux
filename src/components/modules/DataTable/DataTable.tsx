@@ -212,13 +212,19 @@ const HighLight = memo(({ children, show = false, searchText = '' }:
 
     useEffect(() => {
         if (show && searchText && element.current) {
-            let text = element.current.innerHTML as string;
-            let re = new RegExp(searchText, "gi");
-            let newText = text.match(re)?.map((e) => {
-                return text.replace(e, `<mark>${e}</mark>`)
-            }).join('');
-            if (newText)
-                element.current.innerHTML = newText;
+            try {
+                let text = element.current.innerHTML as string;
+                let re = new RegExp(searchText, "gi");
+                let newText = text.match(re)?.map((e) => {
+                    return text.replace(e, `<mark>${e}</mark>`)
+                }).join('');
+                if (newText)
+                    element.current.innerHTML = newText;
+            } catch (e: any) {
+                console.log(e?.message);
+                return;
+            }
+
         }
     }, [show, searchText, element.current])
     return (

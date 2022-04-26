@@ -52,7 +52,12 @@ const Toolbar = () => {
                 }}>
                     <RootDirectory />
                 </Grid.Col>
-                <Grid.Col style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', maxWidth:'60px' }} >
+                <Grid.Col style={{
+                    display: 'flex', alignItems: 'center',
+                    justifyContent: 'flex-end',
+                    maxWidth: '50px',
+                    padding: '0px'
+                }} >
                     <Button onClick={() => (setOpenedDrawer(true))} variant={colorScheme == 'dark' ? 'subtle' : 'filled'}
                         color={colorScheme == 'dark' ? 'blue' : ''}
                         style={{ color: '#fff', padding: '6px' }}>

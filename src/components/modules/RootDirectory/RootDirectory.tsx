@@ -1,14 +1,19 @@
 import { ActionIcon, Grid, Group, Modal, ScrollArea, Select, Text, Tooltip } from '@mantine/core';
 import { useLocalStorage } from '@mantine/hooks';
-import React, { forwardRef, useEffect, useRef, useState } from 'react';
+import React, { forwardRef, LegacyRef, useEffect, useRef, useState } from 'react';
 import { IFile, SelectedDirectoriesItem } from '../../../models/file.model';
-import { Edit, Trash } from 'tabler-icons-react';
+import { Edit, Trash, Upload } from 'tabler-icons-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { State } from '../../../store/reducers';
 import { setSearchDirectory } from '../../../store/actions/search.actions';
 const { ipcRenderer } = window.require('electron');
 
+// const { dialog } = require('electron')
 
+// const electron = window.require('electron')
+// var remote = require('electron').remote
+// console.log("🚀 ~ file: RootDirectory.tsx ~ line 15 ~ remote", remote)
+// console.log("🚀 ~ file: RootDirectory.tsx ~ line 14 ~ electron", electron)
 
 
 
@@ -17,6 +22,7 @@ const RootDirectory = () => {
     const directory = useSelector((state: State) => state.search.directory);
     const dispatch = useDispatch();
     const data = useRef<Array<SelectedDirectoriesItem<IFile>>>([]);
+    const inputFile = useRef<LegacyRef<HTMLInputElement> | HTMLInputElement | any | undefined>(null);
     const [opened, setOpened] = useState(false);
 
 
@@ -44,12 +50,28 @@ const RootDirectory = () => {
 
     }, [rootDirFiles])
 
+    useEffect(() => {
+        if (!inputFile.current) return;
+        let el: HTMLInputElement = inputFile.current
+        el.setAttribute('directory', "true");
+    }, [inputFile.current])
+
     function onSetNewDirectory(newDirectory: string) {
         dispatch(setSearchDirectory(newDirectory));
     }
 
     function onDeleteItem(el: IFile) {
         setRootDirFiles(rootDirFiles.filter(item => (item.path !== el.path)));
+    }
+
+    function onOpenDirectories() {
+        // inputFile.current.click();
+        // console.log(dialog.showOpenDialog({ properties: ['openFile', 'multiSelections'] }))
+    }
+
+    function onChangeDirectoriesSelection(e: any) {
+        console.log("🚀 ~ file: RootDirectory.tsx ~ line 67 ~ onChangeDirectoriesSelection ~ e", e)
+
     }
 
 
@@ -69,9 +91,16 @@ const RootDirectory = () => {
                     nothingFound="No options"
                     data={data.current}
                 />
+                {/* <input hidden ref={inputFile} type="file" onChange={onChangeDirectoriesSelection} /> */}
                 <Tooltip label="Directories selections">
                     <ActionIcon size="md" onClick={() => setOpened(true)}  >
                         <Edit size={14} />
+                    </ActionIcon>
+                </Tooltip>
+
+                <Tooltip label="Add more directories">
+                    <ActionIcon size="md" onClick={onOpenDirectories}  >
+                        <Upload size={14} />
                     </ActionIcon>
                 </Tooltip>
 
@@ -104,12 +133,12 @@ const RootDirectory = () => {
 
                         {(directory !== el.path && el.path !== '/' && el.path !== '/home'
                         ) && (
-                            <Tooltip label="Delete this path directory">
-                                <ActionIcon onClick={() => { onDeleteItem(el) }} size="md" color="red"   >
-                                    <Trash size={14} />
-                                </ActionIcon>
-                            </Tooltip>
-                        )}
+                                <Tooltip label="Delete this path directory">
+                                    <ActionIcon onClick={() => { onDeleteItem(el) }} size="md" color="red"   >
+                                        <Trash size={14} />
+                                    </ActionIcon>
+                                </Tooltip>
+                            )}
                     </Group>
                 ))}
             </ScrollArea>
@@ -127,14 +156,6 @@ const SelectItem = forwardRef<HTMLDivElement, SelectedDirectoriesItem<IFile>>(
         allFiles,
         setRootDirFiles,
         ...others }: SelectedDirectoriesItem<IFile>, ref) => {
-
-
-        function onDeleteDirectory(e: any) {
-            e.stopPropagation();
-            console.log(others.value);
-
-        }
-
         return (<div ref={ref} {...others}>
             <Group noWrap >
                 <img height={30} src={image} />
