@@ -12,6 +12,9 @@ export interface SearchState {
     selectedFileTypes: Array<string>;
     avoidFiles: Array<string>;
     multicores: boolean;
+    matchCase?: boolean;
+    matchExaclyWord?: boolean;
+    regularExpression?: boolean;
   };
   textSize: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   order:
@@ -57,6 +60,9 @@ const initialState: SearchState = {
     selectedFileTypes: [],
     avoidFiles: JSON.parse(loadedAvoidFiles),
     multicores: multicores ? JSON.parse(multicores) : false,
+    matchCase: false,
+    matchExaclyWord: false,
+    regularExpression: false,
   },
   textSize: loadedTextSize ? JSON.parse(loadedTextSize) : 'xs',
   order: loadedOrder ? JSON.parse(loadedOrder) : '+name',

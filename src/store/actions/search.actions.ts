@@ -66,8 +66,11 @@ export const setOptions =
   (options: {
     hiddenFiles?: boolean;
     levels?: number | null | undefined;
-    selectedFileTypes: Array<string>;
-    avoidFiles: Array<string>;
+    selectedFileTypes?: Array<string>;
+    avoidFiles?: Array<string>;
+    matchCase?: boolean;
+    matchExaclyWord?: boolean;
+    regularExpression?: boolean;
   }) =>
   async (dispatch: Function) => {
     return dispatch({

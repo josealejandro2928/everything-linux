@@ -21,10 +21,15 @@ const Toolbar = () => {
 
     const onUpdateOprions = () => {
         let newSettings: any = { ...settings };
+        let newOptions: any = { ...options };
+
         delete newSettings.showHighLight;
+        delete newOptions.matchCase;
+        delete newOptions.matchExaclyWord;
+        delete newOptions.regularExpression;
 
 
-        if (!isObjectEquals(newSettings, options))
+        if (!isObjectEquals(newSettings, newOptions))
             dispatch(setOptions({ ...newSettings }));
 
     }

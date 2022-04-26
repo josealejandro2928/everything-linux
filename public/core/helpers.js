@@ -269,23 +269,36 @@ function getMedataFile(element, fullPath, isDirectory, fileStats) {
      levels: 8,
      selectedFileTypes: [ 'image', 'video' ],
      avoidFiles: [ 'node_modules', 'env', '$Recycle.Bin', '.pyc', 'Windows' ],
-     reportFound: true
+     matchCase: false,
+     matchExaclyWord: false,
+     regularExpression: false,
 }
  * @returns 
  */
 function filterElement(searchParam, element, pathDir, isDirectory, fileStats, options) {
 
-    const elementName = element.name.toLowerCase().trim();
-    let searchItem = searchParam.toLowerCase().trim();
+    /// Search part
+    let elementName = element.name || ''
+    let searchItem = searchParam || ''
     let indexSearch = null;
 
-    if (options.isRegex) {
-        let re = new RegExp(searchItem);
-        indexSearch = elementName.search(re);
+    if (options.regularExpression) {
+        if (options.matchExaclyWord) {
+            searchItem = '^' + searchItem + '$';
+        }
+        let re = new RegExp(searchItem, 'i');
+        if (options.matchCase) re = new RegExp(searchItem);
+        indexSearch = re.test(elementName) ? 1 : -1;
     } else {
-        indexSearch = elementName.includes(searchItem);
+        elementName = options.matchCase ? elementName.trim() : elementName.toLowerCase().trim()
+        searchItem = options.matchCase ? searchItem.trim() : searchItem.toLowerCase().trim();
+        if (options.matchExaclyWord) {
+            indexSearch = searchItem == elementName ? 1 : -1;
+        } else {
+            indexSearch = elementName.includes(searchItem);
+        }
     }
-
+    ///// Search also for data types ///////
     if (indexSearch > -1 && indexSearch) {
         if (options?.selectedFileTypes?.length) {
             let found = filterTypes(options?.selectedFileTypes, elementName)
