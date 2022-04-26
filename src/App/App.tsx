@@ -6,11 +6,11 @@ import { useLocalStorage } from '@mantine/hooks';
 import DataTable from '../components/modules/DataTable/DataTable';
 import Footer from '../components/layout/Footer/Footer';
 import { useDispatch, useSelector } from 'react-redux';
-import { State } from '../store/reducers';
 import { IFile, IRequestSearch } from '../models/file.model';
 import { setIsSearching, setNewResult, setResults } from '../store/actions/search.actions';
 import LoadingSearch from '../components/modules/LoadingSearch/LoadingSearch';
 import usePersistData from '../hooks/usePersistData';
+import { State } from '../store/models/index.state';
 const { ipcRenderer } = window.require('electron');
 
 

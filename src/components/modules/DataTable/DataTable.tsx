@@ -1,15 +1,15 @@
 import React, { memo, useEffect, useRef, useTransition } from 'react';
+import { State } from '../../../store/models/index.state';
 import { ScrollArea, Table, Text, Tooltip } from '@mantine/core';
 import { useDispatch, useSelector } from 'react-redux';
 import { ArrowNarrowDown, ArrowNarrowUp } from 'tabler-icons-react';
-import { State } from '../../../store/reducers';
-import './DataTable.scss'
 import { setOrder } from '../../../store/actions/search.actions';
 import usePersistData from '../../../hooks/usePersistData';
 import { useInView } from "react-intersection-observer";
 import { IFile } from '../../../models/file.model';
 const { ipcRenderer } = window.require('electron');
 
+import './DataTable.scss'
 
 const DataTable = memo(() => {
     const elements = useSelector((state: State) => state.search.result);

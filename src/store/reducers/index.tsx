@@ -1,12 +1,8 @@
 import { combineReducers } from 'redux';
+import { State } from '../models/index.state';
+import searchReducer from './search.reducer';
+import settingsReducer from './setting.reducer';
 
-import searchReducer, { SearchState } from './search.reducer';
-import settingsReducer, { SettingState } from './setting.reducer';
-
-export interface State {
-  search: SearchState;
-  settings: SettingState
-}
 
 const rootReducer = combineReducers<State>({
   search: searchReducer,

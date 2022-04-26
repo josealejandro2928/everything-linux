@@ -1,36 +1,8 @@
 import { IFile } from '../../models/file.model';
+import { SearchState } from '../models/index.state';
 
-////////////////////////// INTERFACES ////////////////////////
-export interface SearchState {
-  directory: string;
-  searchFile: string | null | undefined;
-  result: Array<IFile>;
-  isSearching: boolean;
-  options: {
-    hiddenFiles: boolean;
-    levels: number | null | undefined;
-    selectedFileTypes: Array<string>;
-    avoidFiles: Array<string>;
-    multicores: boolean;
-    matchCase?: boolean;
-    matchExaclyWord?: boolean;
-    regularExpression?: boolean;
-  };
-  textSize: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-  order:
-    | '-name'
-    | '+name'
-    | '-size'
-    | '+size'
-    | '+mimetype'
-    | '-mimetype'
-    | '+lastDateModified'
-    | '-lastDateModified';
-}
-/////////////////////////////////////////////////////////////////
 
 ////////////////////////TYPES////////////////////////////////
-
 export const SET_DIRECTORY = 'SET_DIRECTORY';
 export const SET_SEARCH_FILE = 'SET_SEARCH_FILE';
 export const SET_NEW_RESULT = 'SET_NEW_RESULT';
@@ -39,7 +11,6 @@ export const SET_IS_SERCHING = 'SET_IS_SERCHING';
 export const SET_TEXT_SIZE = 'SET_TEXT_SIZE';
 export const SET_ORDER = 'SET_ORDER';
 export const SET_OPTIONS = 'SET_OPTIONS';
-
 ///////////////////////////////////////////////////////////
 const loadedDirectory = localStorage.getItem('directory');
 const loadedTextSize = localStorage.getItem('textSize');

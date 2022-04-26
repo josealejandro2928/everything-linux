@@ -314,6 +314,16 @@ function filterElement(searchParam, element, pathDir, isDirectory, fileStats, op
     return null
 }
 
+function getFileInfo(uri) {
+    try {
+        let element = { name: path.basename(uri) };
+        let stats = fs.statSync(uri);
+        return getMedataFile(element,uri,stats.isDirectory(),stats);
+    } catch (e) {
+        return null;
+    }
+}
+
 
 
 module.exports = {
@@ -322,6 +332,7 @@ module.exports = {
     copy,
     openExternalApp,
     filterElement,
+    getFileInfo
 }
 
 // bindIcons();

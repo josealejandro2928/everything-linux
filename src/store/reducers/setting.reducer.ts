@@ -1,13 +1,4 @@
-////////////////////////// INTERFACES ////////////////////////
-export interface SettingState {
-  selectedFileTypes: Array<string>;
-  avoidFiles: Array<string>;
-  hiddenFiles: boolean;
-  levels: number | null;
-  showHighLight: boolean;
-  multicores: boolean;
-}
-/////////////////////////////////////////////////////////////////
+import { SettingState } from '../models/index.state';
 
 ////////////////////////TYPES////////////////////////////////
 export const SET_SELECTED_FILE_TYPES = 'SET_SELECTED_FILE_TYPES';
@@ -16,8 +7,8 @@ export const SET_HIDDEN_FILES = 'SET_HIDDEN_FILES';
 export const SET_LEVELS = 'SET_LEVELS';
 export const SET_HIGH_LIGHT = 'SET_HIGH_LIGHT';
 export const SET_MULTICORES = 'SET_MULTICORES';
-
 ///////////////////////////////////////////////////////////
+
 const loadedAvoidFiles = localStorage.getItem('avoidFiles') || '["node_modules","env"]';
 const loadedHiddenFiles = localStorage.getItem('hiddenFiles');
 const loadedLevels = localStorage.getItem('levels');

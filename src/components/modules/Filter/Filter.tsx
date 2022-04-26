@@ -1,14 +1,14 @@
 
-import React, { useState } from 'react';
-import "./Filter.scss"
+
 import DataTypesSelector from './components/DataTypesSelector/DataTypesSelector';
 import { Select, Switch, Text, Tooltip } from '@mantine/core';
 import { useDispatch, useSelector } from 'react-redux';
-import { State } from '../../../store/reducers';
 import { setAvoidFiles, setSelectdFileTypes, setHiddenFiles, setLevels, setHighLight, setMulticores } from '../../../store/actions/settings.actions';
 import { QuestionMark } from 'tabler-icons-react';
 import usePersistData from '../../../hooks/usePersistData';
 import AvoidFilesSelector from './components/AvoidFilesSelector/AvoidFilesSelector';
+import { State } from '../../../store/models/index.state';
+import "./Filter.scss"
 
 const Filters = () => {
 

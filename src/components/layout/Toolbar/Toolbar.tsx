@@ -7,9 +7,9 @@ import RootDirectory from '../../modules/RootDirectory/RootDirectory';
 import SearchInput from '../../modules/SearchInput/SearchInput';
 import Settings from '../../modules/Settings/Settings';
 import { useDispatch, useSelector } from 'react-redux';
-import { State } from '../../../store/reducers';
 import { setOptions } from '../../../store/actions/search.actions';
 import { isObjectEquals } from '../../../functions';
+import { State } from '../../../store/models/index.state';
 
 
 const Toolbar = () => {

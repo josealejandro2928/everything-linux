@@ -1,10 +1,10 @@
 import { ActionIcon, Input, Tooltip } from '@mantine/core';
 import { useDebouncedValue } from '@mantine/hooks';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Eraser, Search, LetterCase, AB,Asterisk } from 'tabler-icons-react';
-import { State } from '../../../store/reducers';
 import { setSearchFile, setOptions } from '../../../store/actions/search.actions';
+import { State } from '../../../store/models/index.state';
 
 
 const SearchInput = () => {

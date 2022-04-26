@@ -2,9 +2,9 @@ console.log("Cargo el core");
 
 const path = require('path');
 const { ipcMain, Menu, BrowserWindow } = require('electron')
-const { searchDir, openExternalApp } = require('./helpers')
+const { searchDir, openExternalApp, getFileInfo } = require('./helpers')
 const { Worker } = require('worker_threads');
-const { shell, clipboard } = require('electron')
+const { shell, clipboard, dialog } = require('electron')
 
 let worker;
 
@@ -113,7 +113,6 @@ ipcMain.on('show-context-menu', (event, file) => {
             click: async () => {
                 try {
                     await openExternalApp('code -n', file.path)
-                    event.sender.send("refresh");
                 } catch (e) {
                     event.sender.send('error', e.message || 'Error')
                 }
@@ -152,4 +151,16 @@ ipcMain.on('show-context-menu', (event, file) => {
 
 ipcMain.on('open-file', (_, file) => {
     shell.openPath(file.path);
+})
+
+ipcMain.on('open-dialog', async (event) => {
+    try {
+        const { canceled, filePaths } = await dialog.showOpenDialog({ title: 'Select directories', properties: ['openDirectory', 'multiSelections'] })
+        if (canceled) return;
+        let data = filePaths.map((item) => getFileInfo(item)).filter((x) => (x != null));
+        event.sender.send("open-dialog-response", data);
+    } catch (e) {
+        console.log(e)
+    }
+
 })

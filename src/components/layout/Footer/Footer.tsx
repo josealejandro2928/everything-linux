@@ -2,9 +2,9 @@ import React, { useMemo } from 'react';
 import { ActionIcon, Slider, useMantineColorScheme, Group, Text } from '@mantine/core';
 import './Footer.scss'
 import { useSelector, useDispatch } from 'react-redux';
-import { State } from '../../../store/reducers';
 import { setTextSize } from '../../../store/actions/search.actions';
 import usePersistData from '../../../hooks/usePersistData';
+import { State } from '../../../store/models/index.state';
 
 function Footer() {
     const { colorScheme } = useMantineColorScheme();
