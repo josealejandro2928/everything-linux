@@ -19,3 +19,13 @@ export interface IRequestSearch {
     levels: number | null | undefined;
   };
 }
+
+export interface SelectedDirectoriesItem<T> {
+  label: string;
+  value: string;
+  description: string;
+  image: any;
+  selectedDirectory: string;
+  allFiles: Array<T>;
+  setRootDirFiles: (val: T | ((prevState: T) => T)) => void;
+}
