@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Linux Search Everything
+Exec="<path to the app>/linux-search-everything" %U
+Terminal=false
+Type=Application
+Icon=<path to the app>/icon.png
+StartupWMClass=Linux Search Everything
+Encoding=UTF-8
+Comment=A tool for search files on Linux.
+Categories=Utility;

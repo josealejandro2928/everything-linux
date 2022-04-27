@@ -180,10 +180,20 @@
     "directories": {
       "buildResources": "build"
     },
+    "extraFiles": [
+      "./logo_512.png",
+      "./logo_256.png",
+      "./logo_128.png",
+      "./logo_64.png",
+      "./icon.png",
+      "./README.md",
+      "./linux-search-everything.desktop"
+    ],
     "copyright": "Copyright © 2022 Jose Alejandro Concepcion Alvarez",
     "linux": {
       "target": [
-        "deb"
+        "deb",
+        "zip"
       ],
       "maintainer": "Jose Alejandro Concepcion Alvarez",
       "icon": "./build/icon.png",
@@ -191,8 +201,12 @@
       "description": "A tool for search files on Linux.",
       "category": "Utility",
       "desktop": {
-        "Encoding": "UTF-8"
+        "Encoding": "UTF-8",
+        "Icon": "/opt/Linux Search Everything/icon.png"
       }
+    },
+    "deb": {
+      "afterInstall": "./build/after-install/after-install-deb.sh"
     }
   }
 }

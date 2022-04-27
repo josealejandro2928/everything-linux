@@ -113,7 +113,8 @@ function getIcon(meta) {
         "class": "java",
         "srt": "text",
         "swf": "video",
-        "dat": "hex"
+        "dat": "hex",
+        "exe": "exe"
 
     }
 
@@ -318,7 +319,7 @@ function getFileInfo(uri) {
     try {
         let element = { name: path.basename(uri) };
         let stats = fs.statSync(uri);
-        return getMedataFile(element,uri,stats.isDirectory(),stats);
+        return getMedataFile(element, uri, stats.isDirectory(), stats);
     } catch (e) {
         return null;
     }
