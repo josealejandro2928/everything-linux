@@ -21,7 +21,7 @@ const initialState: SettingState = {
   hiddenFiles: loadedHiddenFiles ? JSON.parse(loadedHiddenFiles) : false,
   levels: loadedLevels ? JSON.parse(loadedLevels) : 0,
   showHighLight: showHighLight ? JSON.parse(showHighLight) : true,
-  multicores: multicores ? JSON.parse(multicores) : false,
+  multicores: multicores ? JSON.parse(multicores) : true,
 };
 
 const settingsReducer = (

@@ -18,14 +18,14 @@ const Settings = () => {
         <div className='Settings'>
             <ScrollArea style={{ height: '95vh', width: '100%' }}>
                 <TabContainer color='rgb(25, 113, 194)' borderLine >
-                    <TabItem name='Filters'>
+                    <TabItem name='Settings'>
                         <div style={{ padding: '1rem 0.5rem' }}>
                             <Filter />
                         </div>
                     </TabItem>
-                    <TabItem name='Settings'>
+                    {/* <TabItem name='Settings'>
                         <h3>Content2</h3>
-                    </TabItem>
+                    </TabItem> */}
                 </TabContainer>
             </ScrollArea>
 

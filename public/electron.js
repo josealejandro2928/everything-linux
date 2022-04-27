@@ -13,8 +13,8 @@ function createWindow() {
     mainWindow = new BrowserWindow({
         width: 1360,
         height: 720,
-        minWidth: 600,
-        minHeight: 400,
+        minWidth: 900,
+        minHeight: 600,
         title: 'Linux Search Everything',
         icon: iconPath,
         webPreferences: {

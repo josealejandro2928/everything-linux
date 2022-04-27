@@ -36,7 +36,7 @@ const Toolbar = () => {
 
     return <React.Fragment>
         <div className={colorScheme == 'dark' ? 'Toolbar dark' : 'Toolbar light'}>
-            <Grid style={{ margin: '0px' }}>
+            <Grid style={{ margin: '0px', flexWrap: 'nowrap' }}>
                 <Grid.Col style={{
                     display: 'flex', alignItems: 'center', borderRight: `1px solid ${'rgba(255, 255, 255, .2)'}`,
                     padding: '4px 16px'
@@ -54,8 +54,8 @@ const Toolbar = () => {
                 </Grid.Col>
                 <Grid.Col style={{
                     display: 'flex', alignItems: 'center',
-                    justifyContent: 'flex-end',
-                    maxWidth: '50px',
+                    justifyContent: 'center',
+                    maxWidth: '6%',
                     padding: '0px'
                 }} >
                     <Button onClick={() => (setOpenedDrawer(true))} variant={colorScheme == 'dark' ? 'subtle' : 'filled'}
