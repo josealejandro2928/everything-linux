@@ -3,7 +3,7 @@ const path = require('path');
 const { ipcMain, Menu, BrowserWindow } = require('electron')
 const { searchDir, openExternalApp, getFileInfo } = require('./helpers')
 const { Worker } = require('worker_threads');
-const { shell, clipboard, dialog } = require('electron')
+const { shell, clipboard, dialog, nativeImage, Notification } = require('electron')
 
 let worker;
 
@@ -61,6 +61,7 @@ module.exports = function setCommunicationTunnel(mainWindow, isDev, rootPath) {
 
         } catch (e) {
             console.log("🚀 ~ file: index.js ~ line 35 ~ ipcMain.on ~ e", e)
+            showNotification("Upss, Error", e.message || 'There is an error', 'error')
         }
     })
 
@@ -83,80 +84,139 @@ module.exports = function setCommunicationTunnel(mainWindow, isDev, rootPath) {
         }
     })
 
-    ipcMain.on('show-context-menu', (event, file) => {
-        const template = [
-            {
-                id: 'open',
-                label: 'Open',
-                type: 'normal',
-                click: () => { shell.openPath(file.path) }
-            },
-            {
-                id: 'open-select',
-                label: 'Open Path',
-                type: 'normal',
-                click: () => { shell.showItemInFolder(file.path) }
-            },
-            {
-                id: 'copy-name',
-                label: 'Copy Name to Clipboard',
-                type: 'normal',
-                click: () => {
-                    clipboard.writeText(file.name);
-                    event.sender.send('clipboard', "name");
-                }
-            },
-            {
-                id: 'copy-path',
-                label: 'Copy Path to Clipboard',
-                type: 'normal',
-                click: () => {
-                    clipboard.writeText(file.path);
-                    event.sender.send('clipboard', "path");
-                }
-            },
-            { type: 'separator' },
-            {
-                id: 'open-vscode',
-                label: 'Open with vscode',
-                type: 'normal',
-                click: async () => {
-                    try {
-                        await openExternalApp('code -n', file.path)
-                    } catch (e) {
-                        event.sender.send('error', e.message || 'Error')
+    ipcMain.on('show-context-menu', async (event, file) => {
+        const util = require('util');
+        const exec = util.promisify(require('child_process').exec);
+        try {
+            let template = [
+                {
+                    id: 'open',
+                    label: 'Open',
+                    type: 'normal',
+                    click: () => { shell.openPath(file.path) }
+                },
+                {
+                    id: 'open-select',
+                    label: 'Open Path',
+                    icon: nativeImage.createFromPath(path.join(rootPath, 'menu-icons/folder.png')).resize({ height: 16 }),
+                    type: 'normal',
+                    click: () => { shell.showItemInFolder(file.path) }
+                },
+                {
+                    id: 'copy-name',
+                    label: 'Copy Name to Clipboard',
+                    type: 'normal',
+                    click: () => {
+                        clipboard.writeText(file.name);
+                        showNotification('Name copied', 'The file name has been copied to the clipboard');
                     }
-                }
-            },
-            {
-                id: 'compress',
-                label: 'Compres file',
-                type: 'normal',
-                click: async () => {
-                    try {
-                        let name = `"${file.path}"`
-                        await openExternalApp(`zip -r -j ${name}.zip`, `"${file.path}"`);
-                        event.sender.send("refresh");
-                    } catch (e) {
-                        console.log("*********ERROR***********", e);
-                        event.sender.send('error', e.message || 'Error')
+                },
+                {
+                    id: 'copy-path',
+                    label: 'Copy Path to Clipboard',
+                    type: 'normal',
+                    click: () => {
+                        clipboard.writeText(file.path);
+                        showNotification('Path copied', 'The file path has been copied to the clipboard');
                     }
-                }
-            },
-            // { type: 'separator' },
-            // {
-            //     id: 'delete-item',
-            //     label: 'Delete file',
-            //     type: 'normal',
-            //     click: () => {
-            //         shell.trashItem(file.path);
-            //         event.sender.send("refresh");
-            //     }
-            // },
-        ]
-        const menu = Menu.buildFromTemplate(template);
-        const browserWindow = BrowserWindow.fromWebContents(event.sender);
-        menu.popup(browserWindow);
+                },
+                { type: 'separator' },
+                {
+                    id: 'open-vscode',
+                    label: `Open with "vscode"`,
+                    type: 'normal',
+                    icon: nativeImage.createFromPath(path.join(rootPath, 'menu-icons/vscode.png')).resize({ height: 20 }),
+                    click: async () => {
+                        try {
+                            await openExternalApp('code -n', file.path)
+                        } catch (e) {
+                            showNotification("Upss, Error", e.message || 'There is an error', 'error')
+                        }
+                    }
+                },
+                {
+                    id: 'open-nautilus',
+                    label: `Open with "nautilus"`,
+                    type: 'normal',
+                    icon: nativeImage.createFromPath(path.join(rootPath, 'menu-icons/folder.png')).resize({ height: 16 }),
+                    click: async () => {
+                        try {
+                            await openExternalApp('nautilus', file.path)
+                        } catch (e) {
+                            showNotification("Upss, Error", e.message || 'There is an error', 'error')
+                        }
+                    }
+                },
+                {
+                    id: 'open-nemo',
+                    label: `Open with "nemo"`,
+                    type: 'normal',
+                    icon: nativeImage.createFromPath(path.join(rootPath, 'menu-icons/folder.png')).resize({ height: 16 }),
+                    click: async () => {
+                        try {
+                            await openExternalApp('nemo', file.path)
+                        } catch (e) {
+                            showNotification("Upss, Error", e.message || 'There is an error', 'error')
+                        }
+                    }
+                },
+                {
+                    id: 'compress-zip',
+                    label: 'Compres file',
+                    type: 'normal',
+                    icon: nativeImage.createFromPath(path.join(rootPath, 'menu-icons/zip.png')).resize({ height: 16 }),
+                    click: async () => {
+                        try {
+                            let name = `"${file.path}"`
+                            await openExternalApp(`zip -r -j ${name}.zip`, `"${file.path}"`);
+                            event.sender.send("refresh");
+                        } catch (e) {
+                            console.log("*********ERROR***********", e);
+                            showNotification("Upss, Error", e.message || 'There is an error', 'error')
+                        }
+                    }
+                },
+                // { type: 'separator' },
+                // {
+                //     id: 'delete-item',
+                //     label: 'Delete file',
+                //     type: 'normal',
+                //     click: () => {
+                //         shell.trashItem(file.path);
+                //         event.sender.send("refresh");
+                //     }
+                // },
+            ]
+
+            try {
+                await exec('which code');
+            } catch (e) {
+                template = template.filter((el) => (el.id !== 'open-vscode'));
+            }
+
+            try {
+                await exec('which zip');
+            } catch (e) {
+                template = template.filter((el) => (el.id !== 'compress-zip'));
+            }
+
+            try {
+                await exec('which nautilus');
+            } catch (e) {
+                template = template.filter((el) => (el.id !== 'open-nautilus'));
+            }
+            try {
+                await exec('which nemo');
+            } catch (e) {
+                template = template.filter((el) => (el.id !== 'open-nemo'));
+            }
+
+            const menu = Menu.buildFromTemplate(template);
+            const browserWindow = BrowserWindow.fromWebContents(event.sender);
+            menu.popup(browserWindow);
+        } catch (e) {
+            console.log("Error", e);
+        }
     })
 
     ipcMain.on('open-file', (_, file) => {
@@ -176,8 +236,25 @@ module.exports = function setCommunicationTunnel(mainWindow, isDev, rootPath) {
             event.sender.send("open-dialog-response", data)
         } catch (e) {
             console.log(e)
+            showNotification("Upss, Error", e.message || 'There is an error', 'error')
         }
 
     })
+
+    ////////////////////////FUNCTIONS/////////////////
+    function showNotification(title = '', body = '', type = "normal") {
+        let icon = null;
+        switch (type) {
+            case 'normal':
+                icon = nativeImage.createFromPath(path.join(rootPath, 'icon.png')).resize({ height: 512 })
+                break;
+            case 'error':
+                icon = nativeImage.createFromPath(path.join(rootPath, 'menu-icons/error.png')).resize({ height: 512 })
+                break;
+            default:
+                break;
+        }
+        new Notification({ title, body, icon }).show();
+    }
 
 }

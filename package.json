@@ -1,6 +1,6 @@
 {
   "name": "linux-search-everything",
-  "version": "0.0.5",
+  "version": "1.0.0",
   "private": true,
   "homepage": "./",
   "main": "./public/electron.js",
@@ -193,7 +193,7 @@
     "linux": {
       "target": [
         "deb",
-        "zip"
+        "snap"
       ],
       "maintainer": "Jose Alejandro Concepcion Alvarez",
       "icon": "./build/icon.png",
@@ -207,6 +207,12 @@
     },
     "deb": {
       "afterInstall": "./build/after-install/after-install-deb.sh"
+    },
+    "snap": {
+      "desktop": {
+        "Encoding": "UTF-8",
+        "Icon":"${SNAP}/icon.png"
+      }
     }
   }
 }

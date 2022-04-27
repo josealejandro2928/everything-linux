@@ -1,7 +1,7 @@
-import React, { useEffect, useRef, useState, useTransition } from 'react';
+import React, { useEffect, useRef, useTransition } from 'react';
 import './App.scss';
 import Layout from '../components/layout/layout/Layout';
-import { ColorScheme, ColorSchemeProvider, Notification, MantineProvider } from '@mantine/core';
+import { ColorScheme, ColorSchemeProvider, MantineProvider } from '@mantine/core';
 import { useLocalStorage } from '@mantine/hooks';
 import DataTable from '../components/modules/DataTable/DataTable';
 import Footer from '../components/layout/Footer/Footer';
@@ -31,7 +31,6 @@ function App() {
   const options = useSelector((state: State) => state.search.options);
   const isSearching = useSelector((state: State) => state.search.isSearching);
   const mount = useRef<number>(0);
-  const [toast, setToasState] = useState({ title: '', body: '', show: false, color: 'green' });
   const dispatch = useDispatch();
   const [_, startTransition] = useTransition();
   const newFilesComming = useRef<Array<IFile>>([]);
@@ -55,16 +54,12 @@ function App() {
   useEffect(() => {
     ipcRenderer.on('found-result', onFoundResult);
     ipcRenderer.on('finish', onFinish);
-    ipcRenderer.on('clipboard', onClipboard);
     ipcRenderer.on('refresh', onRefresh);
-    ipcRenderer.on('error', onError);
 
     return () => {
       ipcRenderer.removeListener('found-result', onFoundResult);
       ipcRenderer.removeListener('finish', onFinish);
-      ipcRenderer.removeListener('clipboard', onClipboard);
       ipcRenderer.removeListener('refresh', onRefresh);
-      ipcRenderer.removeListener('error', onError);
     }
   }, [])
 
@@ -93,9 +88,7 @@ function App() {
     dispatch(setIsSearching(false));
   }
 
-  function onClipboard(_: any, param: string) {
-    setToasState({ ...toast, show: true, title: `Ok`, body: `${param} copied to clipboard` })
-  }
+
 
   async function onRefresh() {
     if (isBussy) return;
@@ -103,10 +96,6 @@ function App() {
     search(directory, searchFile, options);
     await _delayMs(150);
     isBussy = false;
-  }
-
-  function onError(_: any, param: string) {
-    setToasState({ ...toast, show: true, title: `Error`, body: `${param}`, color: 'red' })
   }
 
   async function search(dir: any, searchPar: any, opt: any) {
@@ -168,48 +157,9 @@ function App() {
           </Layout>
         </div>
         <LoadingSearch key={isSearching as any} opened={isSearching} setOpened={stopCurrentSearch} />
-        <ToastNotification
-          show={toast.show}
-          title={toast.title}
-          body={toast.body}
-          color={toast.color}
-          onClose={() => { setToasState({ ...toast, show: false }) }}
-        />
-
       </MantineProvider>
     </ColorSchemeProvider >
   );
 }
 
 export default App;
-
-
-
-const ToastNotification = ({ show, title, body, onClose, color }:
-  { show: boolean, title: string, body?: any, onClose: Function, color: string }) => {
-  const [showToast, setShowToast] = useState(false);
-  const time = useRef<any>(null);
-
-  useEffect(() => {
-    setShowToast(show);
-    clearTimeout(time.current);
-    if (show) {
-      time.current = setTimeout(() => {
-        closeToast();
-      }, 5000);
-    }
-  }, [show])
-
-  function closeToast() {
-    setShowToast(false);
-    onClose();
-  }
-
-  return (
-    <>
-      {showToast && <Notification onClose={closeToast} color={color} className='ToastNotification' title={title}>
-        {body}
-      </Notification>}
-    </>
-  )
-}
