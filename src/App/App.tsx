@@ -44,7 +44,7 @@ function App() {
 
 
   useEffect(() => {
-    if (mount.current < 2) {
+    if (mount.current < 1) {
       mount.current++;
       return;
     }

@@ -13,7 +13,6 @@ const RootDirectory = () => {
     const directory = useSelector((state: State) => state.search.directory);
     const dispatch = useDispatch();
     const data = useRef<Array<SelectedDirectoriesItem<IFile>>>([]);
-    const isBusy = useRef<boolean>(false);
     const [opened, setOpened] = useState(false);
     const [remount, setRemount] = useState(true);
 
@@ -27,10 +26,7 @@ const RootDirectory = () => {
 
     useEffect(() => {
         ipcRenderer.on("open-dialog-response", (_: any, data: Array<IFile>) => {
-            if (isBusy.current) return;
-            isBusy.current = true;
             updateRootDir(data);
-            const t = setTimeout(() => { isBusy.current = false; clearTimeout(t); }, 100)
         })
     }, [])
 
