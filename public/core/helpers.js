@@ -9,10 +9,8 @@ function searchDir() {
     try {
         let result = [];
         result = result.concat(getDir('/'));
-        let osname = os.hostname().split('-')[0];
-        result = result.concat(getDir(path.join('/', 'home')));
-        result = result.concat(getDir(path.join('/', 'media', osname)));
-        result = result.concat(getDir(path.join('/', 'mnt')));
+        result = getImportantDirectoriesBasedOs(result, os.platform());
+
         result = result.sort((a, b) => {
             if (a.name > b.name) return 1;
             if (a.name < b.name) return -1;
@@ -22,6 +20,7 @@ function searchDir() {
         return result;
     } catch (e) {
         console.log("Error", e);
+        return [];
     }
 
     function getDir(uri) {
@@ -43,8 +42,32 @@ function searchDir() {
         return result;
     }
 
-}
+    function getImportantDirectoriesBasedOs(result, osType) {
+        switch (osType) {
+            case 'linux':
+                let dir = [path.join('/', 'mnt'), path.join('/', 'home')];
+                try {
+                    let output = fs.readdirSync(path.join('/', 'media'));
+                    output = output.map(x => (path.join('/', 'media', x)));
+                    dir = dir.concat(output);
+                } catch (e) {
+                    dir = [...dir];
+                }
+                for (let el of dir) {
+                    result = result.concat(getDir(el));
+                }
+                return result;
+            case 'win32':
+                return result;
+            case 'darwin':
+                return result;
+            default:
+                return result;
+        }
 
+    }
+
+}
 function bindIcons() {
     try {
         let uri = '/media/jose/DATA/03-CODING/Electron/everything-linux/public/icons';
