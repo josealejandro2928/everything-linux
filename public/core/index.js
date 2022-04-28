@@ -128,8 +128,9 @@ module.exports = function setCommunicationTunnel(mainWindow, isDev, rootPath) {
                     icon: nativeImage.createFromPath(path.join(rootPath, 'menu-icons/vscode.png')).resize({ height: 20 }),
                     click: async () => {
                         try {
-                            await openExternalApp('code -n', file.path)
+                            await openExternalApp('code -n',  `"${file.path}"`)
                         } catch (e) {
+                            console.log("Error", e);
                             showNotification("Upss, Error", e.message || 'There is an error', 'error')
                         }
                     }
@@ -141,8 +142,9 @@ module.exports = function setCommunicationTunnel(mainWindow, isDev, rootPath) {
                     icon: nativeImage.createFromPath(path.join(rootPath, 'menu-icons/folder.png')).resize({ height: 16 }),
                     click: async () => {
                         try {
-                            await openExternalApp('nautilus', file.path)
+                            await openExternalApp('nautilus', `"${file.path}"`)
                         } catch (e) {
+                            console.log("Error", e);
                             showNotification("Upss, Error", e.message || 'There is an error', 'error')
                         }
                     }
@@ -154,8 +156,9 @@ module.exports = function setCommunicationTunnel(mainWindow, isDev, rootPath) {
                     icon: nativeImage.createFromPath(path.join(rootPath, 'menu-icons/folder.png')).resize({ height: 16 }),
                     click: async () => {
                         try {
-                            await openExternalApp('nemo', file.path)
+                            await openExternalApp('nemo', `"${file.path}"`)
                         } catch (e) {
+                            console.log("Error", e);
                             showNotification("Upss, Error", e.message || 'There is an error', 'error')
                         }
                     }
@@ -192,23 +195,31 @@ module.exports = function setCommunicationTunnel(mainWindow, isDev, rootPath) {
                 await exec('which code');
             } catch (e) {
                 template = template.filter((el) => (el.id !== 'open-vscode'));
+                console.log("Error", e);
+                showNotification("Upss, Error", e.message || 'There is an error', 'error')
             }
 
             try {
                 await exec('which zip');
             } catch (e) {
                 template = template.filter((el) => (el.id !== 'compress-zip'));
+                console.log("Error", e);
+                showNotification("Upss, Error", e.message || 'There is an error', 'error')
             }
 
             try {
                 await exec('which nautilus');
             } catch (e) {
                 template = template.filter((el) => (el.id !== 'open-nautilus'));
+                console.log("Error", e);
+                showNotification("Upss, Error", e.message || 'There is an error', 'error')
             }
             try {
                 await exec('which nemo');
             } catch (e) {
                 template = template.filter((el) => (el.id !== 'open-nemo'));
+                console.log("Error", e);
+                showNotification("Upss, Error", e.message || 'There is an error', 'error')
             }
 
             const menu = Menu.buildFromTemplate(template);

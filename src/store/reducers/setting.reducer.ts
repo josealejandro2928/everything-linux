@@ -19,7 +19,7 @@ const initialState: SettingState = {
   selectedFileTypes: [],
   avoidFiles: JSON.parse(loadedAvoidFiles),
   hiddenFiles: loadedHiddenFiles ? JSON.parse(loadedHiddenFiles) : false,
-  levels: loadedLevels ? JSON.parse(loadedLevels) : 0,
+  levels: loadedLevels ? JSON.parse(loadedLevels) : 8,
   showHighLight: showHighLight ? JSON.parse(showHighLight) : true,
   multicores: multicores ? JSON.parse(multicores) : true,
 };

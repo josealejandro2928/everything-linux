@@ -27,10 +27,10 @@ const initialState: SearchState = {
   isSearching: false,
   options: {
     hiddenFiles: loadedHiddenFiles ? JSON.parse(loadedHiddenFiles) : false,
-    levels: loadedLevels ? JSON.parse(loadedLevels) : 0,
+    levels: loadedLevels ? JSON.parse(loadedLevels) : 8,
     selectedFileTypes: [],
     avoidFiles: JSON.parse(loadedAvoidFiles),
-    multicores: multicores ? JSON.parse(multicores) : false,
+    multicores: multicores ? JSON.parse(multicores) : true,
     matchCase: false,
     matchExaclyWord: false,
     regularExpression: false,

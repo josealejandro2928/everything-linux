@@ -23,7 +23,7 @@ const Settings = () => {
                             <Filter />
                         </div>
                     </TabItem>
-                    {/* <TabItem name='Settings'>
+                    {/* <TabItem name='More'>
                         <h3>Content2</h3>
                     </TabItem> */}
                 </TabContainer>
