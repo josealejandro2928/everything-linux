@@ -60,7 +60,7 @@ function search(
                 process.send(JSON.stringify({ message: 'found', data: found }), undefined, undefined, (e) => {
                     if (e) {
                         console.log('!!!!!!!got err!!!!!!!!!!', e);
-                        process.kill(process.pid);
+                        process.kill(process.pid, "SIGINT");
                         process.exit(1);
                     }
                 });
@@ -99,7 +99,7 @@ process.on("message", (message) => {
             process.send(JSON.stringify({ message: 'finish' }), undefined, undefined, (e) => {
                 if (e) {
                     console.log('!!!!!!!got err!!!!!!!!!!', e);
-                    process.kill(process.pid);
+                    process.kill(process.pid, "SIGINT");
                     process.exit(1);
                 }
             });

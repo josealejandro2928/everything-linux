@@ -33,7 +33,6 @@ module.exports = function setCommunicationTunnel(mainWindow, isDev, rootPath) {
                 }
             });
 
-
             worker.on('message', (found) => {
                 // console.log("path.join(path.resolve('/'), found.icon)", path.join(path.resolve(), found.icon))
                 found.icon = isDev ? found.icon : path.join(rootPath, found.icon);
@@ -79,8 +78,6 @@ module.exports = function setCommunicationTunnel(mainWindow, isDev, rootPath) {
         console.log("Entre en el Stop");
         if (worker) {
             worker.postMessage({ message: "kill" });
-            // worker.removeAllListeners();
-            // await worker?.terminate();
         }
     })
 
@@ -128,7 +125,7 @@ module.exports = function setCommunicationTunnel(mainWindow, isDev, rootPath) {
                     icon: nativeImage.createFromPath(path.join(rootPath, 'menu-icons/vscode.png')).resize({ height: 20 }),
                     click: async () => {
                         try {
-                            await openExternalApp('code -n',  `"${file.path}"`)
+                            await openExternalApp('code -n', `"${file.path}"`)
                         } catch (e) {
                             console.log("Error", e);
                             showNotification("Upss, Error", e.message || 'There is an error', 'error')
@@ -267,5 +264,20 @@ module.exports = function setCommunicationTunnel(mainWindow, isDev, rootPath) {
         }
         new Notification({ title, body, icon }).show();
     }
+
+    process.on('exit', () => {
+        console.log("*********CLEANING THE TRASH*********");
+        if (worker) {
+            worker.postMessage({ message: "kill" });
+        }
+        process.kill(process.pid, "SIGINT");
+    })
+
+    process.on('SIGINT', () => {
+        console.log("*********CLEANING THE TRASH*********");
+        if (worker) {
+            worker.postMessage({ message: "kill" });
+        }
+    })
 
 }

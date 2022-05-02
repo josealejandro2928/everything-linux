@@ -94,6 +94,7 @@ function distributeInMultipleCores(directories, result) {
     return new Promise((resolve, _) => {
         let distrib = []
         if (!directories.length) {
+            process.kill(process.pid, "SIGINT");
             process.exit(1);
         }
 
@@ -116,6 +117,7 @@ function distributeInMultipleCores(directories, result) {
         for (let child of childsProcess) {
             child.on("error", (err) => {
                 console.log(`Error from child: ${err}`);
+                child?.kill('SIGINT');
             });
 
             child.on("message", (data) => {
@@ -131,7 +133,7 @@ function distributeInMultipleCores(directories, result) {
 
                 if (data?.message == "finish") {
                     console.log("Finish", child.pid);
-                    child.kill();
+                    child?.kill('SIGINT');
                     onLive = onLive.filter((el) => el !== child.pid);
                     resolve(true);
                     !onLive.length ? process.exit(1) : null;
@@ -144,7 +146,7 @@ function distributeInMultipleCores(directories, result) {
             if (data.message == "kill") {
                 console.log("Entre en el corte de todos los procesos", data)
                 for (let child of childsProcess) {
-                    child.kill();
+                    child?.kill('SIGINT');
                 }
                 onLive = [];
                 resolve(true);
@@ -160,6 +162,8 @@ function singleCoreSearch(directories, searchParam, options, result, onlyRoot) {
 
     parentPort.on("message", (data) => {
         if (data.message == "kill") {
+            console.log("Entre en el corte de todos los procesos", data)
+            process.kill(process.pid, "SIGINT");
             process.exit(1);
         }
     })
@@ -220,9 +224,9 @@ function singleCoreSearch(directories, searchParam, options, result, onlyRoot) {
 
 try {
     search(directories, searchParam, options);
-
 } catch (err) {
     console.log("***************ERROR************", err);
+    process.kill(process.pid, "SIGINT");
     process.exit(0);
 }
 
