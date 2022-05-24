@@ -193,9 +193,7 @@
     "copyright": "Copyright © 2022 Jose Alejandro Concepcion Alvarez",
     "linux": {
       "target": [
-        "deb",
-        "zip",
-        "rpm"
+        "snap"
       ],
       "maintainer": "Jose Alejandro Concepcion Alvarez",
       "icon": "./build/icon.png",
@@ -211,6 +209,7 @@
       "afterInstall": "./build/after-install/after-install-deb.sh"
     },
     "snap": {
+      "confinement":"classic",
       "plugs": [
         "desktop",
         "desktop-legacy",
@@ -221,7 +220,6 @@
         "network",
         "gsettings",
         "opengl",
-        "block-devices",
         "classic-support",
         "hardware-observe",
         "home",
@@ -245,10 +243,6 @@
               "/dev",
               "/bin",
               "/snap"
-            ],
-            "write": [
-              "/home",
-              "/mnt"
             ]
           }
         }

@@ -17,6 +17,8 @@ const { ipcRenderer } = window.require('electron');
 let isBussy = false;
 
 function App() {
+  const version = "1.1.1";
+  
   const [colorScheme, setColorScheme] = useLocalStorage<ColorScheme>({
     key: 'mantine-color-scheme',
     defaultValue: 'dark',
