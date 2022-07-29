@@ -4,6 +4,7 @@
   "private": true,
   "homepage": "./",
   "main": "./public/electron.js",
+  "license": "MIT",
   "author": {
     "name": "Jose Alejandro Concepcion Alvarez",
     "email": "jalejandroc2928@gmail.com",
@@ -209,7 +210,7 @@
       "afterInstall": "./build/after-install/after-install-deb.sh"
     },
     "snap": {
-      "confinement":"classic",
+      "confinement": "classic",
       "plugs": [
         "desktop",
         "desktop-legacy",
