@@ -210,7 +210,7 @@
       "afterInstall": "./build/after-install/after-install-deb.sh"
     },
     "snap": {
-      "confinement": "classic",
+      "confinement": "strict",
       "plugs": [
         "desktop",
         "desktop-legacy",
@@ -224,7 +224,6 @@
         "classic-support",
         "hardware-observe",
         "home",
-        "system-backup",
         "system-observe",
         "process-control",
         "hostname-control",
@@ -247,6 +246,9 @@
             ]
           }
         }
+      ],
+      "slots": [
+        "system-backup"
       ],
       "desktop": {
         "Encoding": "UTF-8",
