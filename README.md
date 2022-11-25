@@ -77,3 +77,6 @@ To see slug problems with the .snap package and to see the recommendations
 ```
 sudo journalctl --output=short --follow --all | sudo snappy-debug -r
 ```
+
+## Youtube Video
+[![main video](https://user-images.githubusercontent.com/37028825/166125854-573fdbff-f9cc-4e2c-ac1f-dd7f22100f7a.png)](https://youtu.be/6iVXQYM4GPg)
